@@ -34,9 +34,9 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 public class ArchiveActivity extends Activity
 {
 
-    private static final String FILENAME = "archivefile.sav";
+  //  private static final String FILENAME = "archivefile.sav";
 
-    protected ArrayList<String> archivedList;
+    protected static ArrayList<String> archivedList;
     
     protected ArrayList<String> checkArchiveItem;
 
@@ -49,9 +49,19 @@ public class ArchiveActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+       // loadFromFile();
+       // if (archivedList == null)
+           // archivedList = new ArrayList<String>();
+      //  if (checkArchiveItem == null)
+       //     checkArchiveItem = new ArrayList<String>();
+        
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_archive);
 
+        //adapter = new ArrayAdapter<String>(this,
+        //        android.R.layout.simple_list_item_multiple_choice, archivedList);
+        //archiveListView.setAdapter(adapter);
         archiveListView = (ListView) findViewById(R.id.archive_listview);
 
         archiveListView.setItemsCanFocus(false);
@@ -66,23 +76,23 @@ public class ArchiveActivity extends Activity
             checkArchiveItem.add("true");
             int position = adapter.getPosition(toArchive[0]);
             archiveListView.setItemChecked(position, true);
-            saveInFile();
+          //  saveInFile();
         }
         else
         {
             adapter.add(toArchive[0]);
             checkArchiveItem.add("false");
-            saveInFile();
+           // saveInFile();
         }   
 
     }
 
     // taken from lonelyTwitter
-    @Override
+  /*  @Override
     protected void onStart()
     {
         super.onStart();
-        loadFromFile();
+       // loadFromFile();
         if (archivedList == null)
             archivedList = new ArrayList<String>();
         if (checkArchiveItem == null)
@@ -92,17 +102,17 @@ public class ArchiveActivity extends Activity
                 android.R.layout.simple_list_item_multiple_choice, archivedList);
         archiveListView.setAdapter(adapter);
 
-      /*  for (int i = 0; i < checkArchiveItem.size(); i++)
+        for (int i = 0; i < checkArchiveItem.size(); i++)
         {
             if (checkArchiveItem.get(i).equals("true") == true)
             {
                 //todoListView.setItemChecked(todoListView.get, true);
             }
-        } */
-    }
+        } 
+    }*/
 
     // taken from lonely twitter
-    private void loadFromFile()
+ /*   private void loadFromFile()
     {
         try
         {
@@ -155,7 +165,7 @@ public class ArchiveActivity extends Activity
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
+    } */
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
@@ -189,7 +199,7 @@ public class ArchiveActivity extends Activity
                 // return true;
                 // case R.id.summary_option:
                 // accessSummary();
-                // thid return true;
+                // return true;
             default:
                 return super.onContextItemSelected(item);
         }
@@ -208,7 +218,7 @@ public class ArchiveActivity extends Activity
             setResult(Activity.RESULT_OK, backToMainIntent);
             archivedList.remove(position);
             adapter.notifyDataSetChanged();
-            saveInFile();
+           // saveInFile();
             finish();
         }
         else
@@ -219,7 +229,7 @@ public class ArchiveActivity extends Activity
             setResult(Activity.RESULT_OK, backToMainIntent);
             archivedList.remove(position);
             adapter.notifyDataSetChanged();
-            saveInFile();
+         //   saveInFile();
             finish();
         }
     }
@@ -241,7 +251,7 @@ public class ArchiveActivity extends Activity
             {
                 archivedList.remove(finalPosition);
                 adapter.notifyDataSetChanged();
-                saveInFile();
+               // saveInFile();
             }
 
         });
@@ -277,5 +287,10 @@ public class ArchiveActivity extends Activity
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    
+    public static ArrayList<String> giveList()
+    {
+        return archivedList;
     }
 }

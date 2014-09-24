@@ -28,6 +28,7 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -55,15 +56,16 @@ import android.widget.ListView;
 public class MainActivity extends Activity
 {
 
-    private static final String FILENAME = "file.sav";
+  //  private static final String FILENAME = "file.sav";
 
     public final static String EXTRA_MESSAGE = "com.example.cmput301_asn1";
 
     protected ArrayList<String> todoList;
 
-    protected ArrayList<String> checkListItem;
+  //  protected ArrayList<String> checkListItem;
 
     protected ArrayAdapter<String> adapter;
+    protected EditText todoText;
 
     protected ListView todoListView;
 
@@ -72,14 +74,28 @@ public class MainActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        registerForContextMenu(todoListView);
+        todoListView = (ListView) findViewById(R.id.todo_listview);
+        
+       // loadFromFile();
+       // if (todoList == null)
+        todoList = new ArrayList<String>();
+      //  if (checkListItem == null)
+       //     checkListItem = new ArrayList<String>();
+        
+        adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_multiple_choice, todoList);
+        todoListView.setAdapter(adapter);
 
+        
+        todoText = (EditText) findViewById(R.id.addTodoText);
         // initiates new array list to hold list items
         // also an adapter that has check boxes for the list
         // and a button to add items to the list
-        todoListView = (ListView) findViewById(R.id.todo_listview);
 
-        todoListView.setItemsCanFocus(false);
-        registerForContextMenu(todoListView);
+
+        //todoListView.setItemsCanFocus(false);
+
 
         Button add_button = (Button) findViewById(R.id.addButton);
         // initiate a list view for the array list and its check boxes
@@ -93,22 +109,22 @@ public class MainActivity extends Activity
             @Override
             public void onClick(View v)
             {
-                EditText todoText = (EditText) findViewById(R.id.addTodoText);
+               // setResult(RESULT_OK);
                 String todoString = todoText.getText().toString();
                 todoList.add(todoString);
                 adapter.notifyDataSetChanged();
-                checkListItem.add("false");
-                saveInFile();
+              //  checkListItem.add("false");
+              //  saveInFile();
             }
         });
 
-        todoListView.setOnItemClickListener(new OnItemClickListener()
+       /* todoListView.setOnItemClickListener(new OnItemClickListener()
         {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                     int position, long id)
-            { // TODO Auto-generated method stub
+            {
                 CheckedTextView item = (CheckedTextView) view;
                 if (item.isChecked())
                     checkListItem.set(position, "true");
@@ -116,41 +132,144 @@ public class MainActivity extends Activity
                     checkListItem.set(position, "false");
                 saveInFile();
             }
-        });
+        }); */
 
     }
 
     // taken from lonelyTwitter
-    @Override
+  /*  @Override
     protected void onStart()
     {
         super.onStart();
-        loadFromFile();
+       // loadFromFile();
         if (todoList == null)
             todoList = new ArrayList<String>();
-        if (checkListItem == null)
-            checkListItem = new ArrayList<String>();
+      //  if (checkListItem == null)
+       //     checkListItem = new ArrayList<String>();
+        
         adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_multiple_choice, todoList);
         todoListView.setAdapter(adapter);
-        
-       /* for(int i = 0; i < checkListItem.size();i++)
-        {
-            if(checkListItem.get(i).equals("true") == true)
-            {
-                //todoListView.setItemChecked(todoListView.get, true);
-            }
-        }
-        */
-    }
-   /* @Override
-    protected void onResume()
-    {
-        
-    } */
 
+        /*
+         * for(int i = 0; i < checkListItem.size();i++) {
+         * if(checkListItem.get(i).equals("true") == true) {
+         * //todoListView.setItemChecked(todoListView.get, true); } }
+         *
+    }*/
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+            ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.context_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+                .getMenuInfo();
+        int position = info.position;
+        View v = info.targetView;
+        switch (item.getItemId())
+        {
+            case R.id.delete_option:
+                deleteItem(position);
+                return true;
+            case R.id.archive_option:
+                archiveItem(position, v);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    private void archiveItem(int position, View v)
+    {
+        Intent intent = new Intent(this, ArchiveActivity.class);
+
+        CheckedTextView item = (CheckedTextView) v;
+        if (item.isChecked())
+        {
+            String[] toArchive = { todoList.get(position).toString(), "true" };
+            intent.putExtra(EXTRA_MESSAGE, toArchive);
+            startActivity(intent);
+        }
+        else
+        {
+            String[] toArchive = { todoList.get(position).toString(), "false" };
+            intent.putExtra(EXTRA_MESSAGE, toArchive);
+            startActivity(intent);
+        }
+        todoList.remove(position);
+        adapter.notifyDataSetChanged();
+      //  saveInFile();
+    }
+
+    // Adapted from student-picker
+    private void deleteItem(int position)
+    {
+        AlertDialog.Builder deladb = new AlertDialog.Builder(MainActivity.this);
+        deladb.setMessage("Delete " + todoList.get(position).toString() + "?");
+        deladb.setCancelable(true);
+        final int finalPosition = position;
+        deladb.setPositiveButton("Delete", new OnClickListener()
+        {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                todoList.remove(finalPosition);
+                adapter.notifyDataSetChanged();
+               // saveInFile();
+            }
+
+        });
+        deladb.setNegativeButton("Cancel", new OnClickListener()
+        {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                // Cancels.
+            }
+        });
+        deladb.show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_settings)
+        {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void emailItem(MenuItem menu)
+    {
+        Intent intent = new Intent(MainActivity.this, EmailActivity.class);
+        startActivity(intent);
+    }
+    
     // taken from lonely twitter
-    private void loadFromFile()
+  /*  private void loadFromFile()
     {
         try
         {
@@ -203,114 +322,5 @@ public class MainActivity extends Activity
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-            ContextMenuInfo menuInfo)
-    {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.context_menu, menu);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item)
-    {
-        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
-                .getMenuInfo();
-        int position = info.position;
-        View v = info.targetView;
-        switch (item.getItemId())
-        {
-            case R.id.delete_option:
-                deleteItem(position);
-                return true;
-            case R.id.archive_option:
-                archiveItem(position, v);
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }
-
-    private void archiveItem(int position, View v)
-    {
-        Intent intent = new Intent(this, ArchiveActivity.class);
-
-        CheckedTextView item = (CheckedTextView) v;
-        if (item.isChecked())
-        {
-            String[] toArchive = { todoList.get(position).toString(), "true" };
-            intent.putExtra(EXTRA_MESSAGE, toArchive);
-            startActivity(intent);
-        }
-        else
-        {
-            String[] toArchive = { todoList.get(position).toString(), "false" };
-            intent.putExtra(EXTRA_MESSAGE, toArchive);
-            startActivity(intent);
-        }
-        todoList.remove(position);
-        adapter.notifyDataSetChanged();
-        saveInFile();
-    }
-
-    // Adapted from student-picker
-    private void deleteItem(int position)
-    {
-        AlertDialog.Builder deladb = new AlertDialog.Builder(MainActivity.this);
-        deladb.setMessage("Delete " + todoList.get(position).toString() + "?");
-        deladb.setCancelable(true);
-        final int finalPosition = position;
-        deladb.setPositiveButton("Delete", new OnClickListener()
-        {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                todoList.remove(finalPosition);
-                adapter.notifyDataSetChanged();
-                saveInFile();
-            }
-
-        });
-        deladb.setNegativeButton("Cancel", new OnClickListener()
-        {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                // Cancels.
-            }
-        });
-        deladb.show();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings)
-        {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    
-    public void emailItem(MenuItem menu)
-    {
-        
-    }
+    } */
 }

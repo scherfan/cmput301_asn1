@@ -10,9 +10,9 @@
     tools:context="com.example.cmput301_asn1.EmailActivity" >
 
     <ListView
-        android:id="@+id/archivetodolist"
+        android:id="@+id/emailarchivelist"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="227dp"
         android:layout_column="0"
         android:layout_gravity="left|bottom"
         android:layout_row="4"
