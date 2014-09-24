@@ -46,16 +46,16 @@ public class ArchiveActivity extends Activity
         registerForContextMenu(archiveListView);
 
         Intent intent = getIntent();
-        String toArchive = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
-        String checkChecked = toArchive.replaceAll("/", "");
-        if (toArchive.equals(checkChecked) == false)
+        String[] toArchive = intent
+                .getStringArrayExtra(MainActivity.EXTRA_MESSAGE);
+        if (toArchive[1].equals("true") == true)
         {
-            adapter.add(checkChecked);
-            int position = archiveListView.getLastVisiblePosition();
-            archiveListView.getItemAtPosition(position);
+            adapter.add(toArchive[0]);
+            int position = adapter.getPosition(toArchive[0]);
             archiveListView.setItemChecked(position, true);
         }
-        else adapter.add(toArchive);
+        else
+            adapter.add(toArchive[0]);
     }
 
     @Override
@@ -82,15 +82,15 @@ public class ArchiveActivity extends Activity
             case R.id.unarchive_option:
                 unarchiveItem(position, v);
                 return true;
-            case R.id.email_option:
+         //   case R.id.email_option:
                 // emailItem();
-                return true;
-            case R.id.action_settings:
+           //     return true;
+           // case R.id.action_settings:
                 // accessSettings();
-                return true;
-            case R.id.summary_option:
+             //   return true;
+            //case R.id.summary_option:
                 // accessSummary();
-                return true;
+              //thid  return true;
             default:
                 return super.onContextItemSelected(item);
         }
@@ -99,12 +99,24 @@ public class ArchiveActivity extends Activity
     private void unarchiveItem(int position, View v)
     {
         Intent backToMainIntent = new Intent(this, MainActivity.class);
-        String unArchive = archivedList.get(position).toString();
+
         CheckedTextView item = (CheckedTextView) v;
-        if (item.isChecked()) unArchive = unArchive + "/";
-        backToMainIntent.putExtra(EXTRA_UNARCHIVEDITEM, unArchive);
-        setResult(Activity.RESULT_OK, backToMainIntent);
-        finish();
+        if (item.isChecked())
+        {
+            String[] unArchive = { archivedList.get(position).toString(),
+                    "true" };
+            backToMainIntent.putExtra(EXTRA_UNARCHIVEDITEM, unArchive);
+            setResult(Activity.RESULT_OK, backToMainIntent);
+            finish();
+        }
+        else
+        {
+            String[] unArchive = { archivedList.get(position).toString(),
+                    "false" };
+            backToMainIntent.putExtra(EXTRA_UNARCHIVEDITEM, unArchive);
+            setResult(Activity.RESULT_OK, backToMainIntent);
+            finish();
+        }
     }
 
     // Adapted from student-picker
@@ -154,7 +166,10 @@ public class ArchiveActivity extends Activity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) { return true; }
+        if (id == R.id.action_settings)
+        {
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 }

@@ -104,37 +104,43 @@ public class MainActivity extends Activity
         View v = info.targetView;
         switch (item.getItemId())
         {
-        case R.id.delete_option:
-            deleteItem(position);
-            return true;
-        case R.id.archive_option:
-            archiveItem(position, v);
-            return true;
-            // case R.id.email_option:
-            // emailItem();
-            // return true;
-            // case R.id.action_settings:
-            // accessSettings();
-            // return true;
-            // case R.id.summary_option:
-            // accessSummary();
-            // return true;
-        default:
-            return super.onContextItemSelected(item);
+            case R.id.delete_option:
+                deleteItem(position);
+                return true;
+            case R.id.archive_option:
+                archiveItem(position, v);
+                return true;
+                // case R.id.email_option:
+                // emailItem();
+                // return true;
+                // case R.id.action_settings:
+                // accessSettings();
+                // return true;
+                // case R.id.summary_option:
+                // accessSummary();
+                // return true;
+            default:
+                return super.onContextItemSelected(item);
         }
     }
 
     private void archiveItem(int position, View v)
     {
         Intent intent = new Intent(this, ArchiveActivity.class);
-        String toArchive = todoList.get(position).toString();
+
         CheckedTextView item = (CheckedTextView) v;
         if (item.isChecked())
         {
-            toArchive = toArchive + "/";
+            String[] toArchive = {todoList.get(position).toString(), "true"};
+            intent.putExtra(EXTRA_MESSAGE, toArchive);
+            startActivity(intent);
         }
-        intent.putExtra(EXTRA_MESSAGE, toArchive);
-        startActivity(intent);
+        else
+        {
+            String[] toArchive = {todoList.get(position).toString(), "false"};
+            intent.putExtra(EXTRA_MESSAGE, toArchive);
+            startActivity(intent);
+        }
     }
 
     // Adapted from student-picker
