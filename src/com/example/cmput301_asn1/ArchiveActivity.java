@@ -1,7 +1,19 @@
 
 package com.example.cmput301_asn1;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -22,7 +34,11 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 public class ArchiveActivity extends Activity
 {
 
+    private static final String FILENAME = "archivefile.sav";
+
     protected ArrayList<String> archivedList;
+    
+    protected ArrayList<String> checkArchiveItem;
 
     protected ArrayAdapter<String> adapter;
 
@@ -36,12 +52,8 @@ public class ArchiveActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_archive);
 
-        archivedList = new ArrayList<String>();
-        adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_multiple_choice, archivedList);
         archiveListView = (ListView) findViewById(R.id.archive_listview);
 
-        archiveListView.setAdapter(adapter);
         archiveListView.setItemsCanFocus(false);
         registerForContextMenu(archiveListView);
 
@@ -51,11 +63,98 @@ public class ArchiveActivity extends Activity
         if (toArchive[1].equals("true") == true)
         {
             adapter.add(toArchive[0]);
+            checkArchiveItem.add("true");
             int position = adapter.getPosition(toArchive[0]);
             archiveListView.setItemChecked(position, true);
+            saveInFile();
         }
         else
+        {
             adapter.add(toArchive[0]);
+            checkArchiveItem.add("false");
+            saveInFile();
+        }   
+
+    }
+
+    // taken from lonelyTwitter
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        loadFromFile();
+        if (archivedList == null)
+            archivedList = new ArrayList<String>();
+        if (checkArchiveItem == null)
+            checkArchiveItem = new ArrayList<String>();
+        
+        adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_multiple_choice, archivedList);
+        archiveListView.setAdapter(adapter);
+
+      /*  for (int i = 0; i < checkArchiveItem.size(); i++)
+        {
+            if (checkArchiveItem.get(i).equals("true") == true)
+            {
+                //todoListView.setItemChecked(todoListView.get, true);
+            }
+        } */
+    }
+
+    // taken from lonely twitter
+    private void loadFromFile()
+    {
+        try
+        {
+            FileInputStream fis = openFileInput(FILENAME);
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+            Gson gson = new Gson();
+            // Following was from:
+            // https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
+            Type listType = new TypeToken<ArrayList<String>>()
+            {
+            }.getType();
+            archivedList = gson.fromJson(in, listType);
+            Type newlistType = new TypeToken<ArrayList<String>>()
+            {
+            }.getType();
+            checkArchiveItem = gson.fromJson(in, newlistType);
+        }
+        catch (FileNotFoundException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    // taken from lonelytwitter
+    private void saveInFile()
+    {
+        try
+        {
+            FileOutputStream fos = openFileOutput(FILENAME, 0);
+            Gson gson = new Gson();
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            gson.toJson(archivedList, osw);
+            gson.toJson(checkArchiveItem, osw);
+            osw.flush();
+            fos.close();
+        }
+        catch (FileNotFoundException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -82,15 +181,15 @@ public class ArchiveActivity extends Activity
             case R.id.unarchive_option:
                 unarchiveItem(position, v);
                 return true;
-         //   case R.id.email_option:
+                // case R.id.email_option:
                 // emailItem();
-           //     return true;
-           // case R.id.action_settings:
+                // return true;
+                // case R.id.action_settings:
                 // accessSettings();
-             //   return true;
-            //case R.id.summary_option:
+                // return true;
+                // case R.id.summary_option:
                 // accessSummary();
-              //thid  return true;
+                // thid return true;
             default:
                 return super.onContextItemSelected(item);
         }
@@ -107,6 +206,9 @@ public class ArchiveActivity extends Activity
                     "true" };
             backToMainIntent.putExtra(EXTRA_UNARCHIVEDITEM, unArchive);
             setResult(Activity.RESULT_OK, backToMainIntent);
+            archivedList.remove(position);
+            adapter.notifyDataSetChanged();
+            saveInFile();
             finish();
         }
         else
@@ -115,6 +217,9 @@ public class ArchiveActivity extends Activity
                     "false" };
             backToMainIntent.putExtra(EXTRA_UNARCHIVEDITEM, unArchive);
             setResult(Activity.RESULT_OK, backToMainIntent);
+            archivedList.remove(position);
+            adapter.notifyDataSetChanged();
+            saveInFile();
             finish();
         }
     }
@@ -136,6 +241,7 @@ public class ArchiveActivity extends Activity
             {
                 archivedList.remove(finalPosition);
                 adapter.notifyDataSetChanged();
+                saveInFile();
             }
 
         });

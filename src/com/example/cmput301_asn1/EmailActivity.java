@@ -1,12 +1,11 @@
 
 package com.example.cmput301_asn1;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class EmailActivity extends Activity
+public class EmailActivity extends MainActivity
 {
 
     @Override

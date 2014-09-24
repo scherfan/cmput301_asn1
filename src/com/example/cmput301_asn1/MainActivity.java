@@ -18,7 +18,19 @@
 
 package com.example.cmput301_asn1;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -31,7 +43,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
@@ -41,9 +55,13 @@ import android.widget.ListView;
 public class MainActivity extends Activity
 {
 
+    private static final String FILENAME = "file.sav";
+
     public final static String EXTRA_MESSAGE = "com.example.cmput301_asn1";
 
     protected ArrayList<String> todoList;
+
+    protected ArrayList<String> checkListItem;
 
     protected ArrayAdapter<String> adapter;
 
@@ -58,17 +76,13 @@ public class MainActivity extends Activity
         // initiates new array list to hold list items
         // also an adapter that has check boxes for the list
         // and a button to add items to the list
-        todoList = new ArrayList<String>();
-        adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_multiple_choice, todoList);
         todoListView = (ListView) findViewById(R.id.todo_listview);
+
+        todoListView.setItemsCanFocus(false);
+        registerForContextMenu(todoListView);
 
         Button add_button = (Button) findViewById(R.id.addButton);
         // initiate a list view for the array list and its check boxes
-
-        todoListView.setAdapter(adapter);
-        todoListView.setItemsCanFocus(false);
-        registerForContextMenu(todoListView);
 
         // waits for add button to be clicked and then
         // converts text in the edit test to a string and
@@ -81,9 +95,114 @@ public class MainActivity extends Activity
             {
                 EditText todoText = (EditText) findViewById(R.id.addTodoText);
                 String todoString = todoText.getText().toString();
-                adapter.add(todoString);
+                todoList.add(todoString);
+                adapter.notifyDataSetChanged();
+                checkListItem.add("false");
+                saveInFile();
             }
         });
+
+        todoListView.setOnItemClickListener(new OnItemClickListener()
+        {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                    int position, long id)
+            { // TODO Auto-generated method stub
+                CheckedTextView item = (CheckedTextView) view;
+                if (item.isChecked())
+                    checkListItem.set(position, "true");
+                else
+                    checkListItem.set(position, "false");
+                saveInFile();
+            }
+        });
+
+    }
+
+    // taken from lonelyTwitter
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        loadFromFile();
+        if (todoList == null)
+            todoList = new ArrayList<String>();
+        if (checkListItem == null)
+            checkListItem = new ArrayList<String>();
+        adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_multiple_choice, todoList);
+        todoListView.setAdapter(adapter);
+        
+       /* for(int i = 0; i < checkListItem.size();i++)
+        {
+            if(checkListItem.get(i).equals("true") == true)
+            {
+                //todoListView.setItemChecked(todoListView.get, true);
+            }
+        }
+        */
+    }
+   /* @Override
+    protected void onResume()
+    {
+        
+    } */
+
+    // taken from lonely twitter
+    private void loadFromFile()
+    {
+        try
+        {
+            FileInputStream fis = openFileInput(FILENAME);
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+            Gson gson = new Gson();
+            // Following was from:
+            // https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
+            Type listType = new TypeToken<ArrayList<String>>()
+            {
+            }.getType();
+            todoList = gson.fromJson(in, listType);
+            Type newlistType = new TypeToken<ArrayList<String>>()
+            {
+            }.getType();
+            checkListItem = gson.fromJson(in, newlistType);
+        }
+        catch (FileNotFoundException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    // taken from lonelytwitter
+    private void saveInFile()
+    {
+        try
+        {
+            FileOutputStream fos = openFileOutput(FILENAME, 0);
+            Gson gson = new Gson();
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            gson.toJson(todoList, osw);
+            gson.toJson(checkListItem, osw);
+            osw.flush();
+            fos.close();
+        }
+        catch (FileNotFoundException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -110,15 +229,6 @@ public class MainActivity extends Activity
             case R.id.archive_option:
                 archiveItem(position, v);
                 return true;
-                // case R.id.email_option:
-                // emailItem();
-                // return true;
-                // case R.id.action_settings:
-                // accessSettings();
-                // return true;
-                // case R.id.summary_option:
-                // accessSummary();
-                // return true;
             default:
                 return super.onContextItemSelected(item);
         }
@@ -131,16 +241,19 @@ public class MainActivity extends Activity
         CheckedTextView item = (CheckedTextView) v;
         if (item.isChecked())
         {
-            String[] toArchive = {todoList.get(position).toString(), "true"};
+            String[] toArchive = { todoList.get(position).toString(), "true" };
             intent.putExtra(EXTRA_MESSAGE, toArchive);
             startActivity(intent);
         }
         else
         {
-            String[] toArchive = {todoList.get(position).toString(), "false"};
+            String[] toArchive = { todoList.get(position).toString(), "false" };
             intent.putExtra(EXTRA_MESSAGE, toArchive);
             startActivity(intent);
         }
+        todoList.remove(position);
+        adapter.notifyDataSetChanged();
+        saveInFile();
     }
 
     // Adapted from student-picker
@@ -158,6 +271,7 @@ public class MainActivity extends Activity
             {
                 todoList.remove(finalPosition);
                 adapter.notifyDataSetChanged();
+                saveInFile();
             }
 
         });
@@ -193,5 +307,10 @@ public class MainActivity extends Activity
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+    
+    public void emailItem(MenuItem menu)
+    {
+        
     }
 }

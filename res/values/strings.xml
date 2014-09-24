@@ -16,5 +16,7 @@
     <string name="title_activity_email">EmailActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_summary">SummaryActivity</string>
+    <string name="email_todo_title">TODO</string>
+    <string name="email_archive_title">Archive</string>
 
 </resources>
