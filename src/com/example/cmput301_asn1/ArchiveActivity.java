@@ -1,18 +1,7 @@
 
 package com.example.cmput301_asn1;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -38,7 +27,7 @@ public class ArchiveActivity extends Activity
 
     protected static ArrayList<String> archivedList;
     
-    protected ArrayList<String> checkArchiveItem;
+   // protected ArrayList<String> checkArchiveItem;
 
     protected ArrayAdapter<String> adapter;
 
@@ -51,7 +40,7 @@ public class ArchiveActivity extends Activity
     {
        // loadFromFile();
        // if (archivedList == null)
-           // archivedList = new ArrayList<String>();
+    	archivedList = new ArrayList<String>();
       //  if (checkArchiveItem == null)
        //     checkArchiveItem = new ArrayList<String>();
         
@@ -59,11 +48,11 @@ public class ArchiveActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_archive);
 
-        //adapter = new ArrayAdapter<String>(this,
-        //        android.R.layout.simple_list_item_multiple_choice, archivedList);
-        //archiveListView.setAdapter(adapter);
-        archiveListView = (ListView) findViewById(R.id.archive_listview);
 
+        archiveListView = (ListView) findViewById(R.id.archive_listview);
+        adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_multiple_choice, archivedList);
+        archiveListView.setAdapter(adapter);
         archiveListView.setItemsCanFocus(false);
         registerForContextMenu(archiveListView);
 
@@ -73,7 +62,7 @@ public class ArchiveActivity extends Activity
         if (toArchive[1].equals("true") == true)
         {
             adapter.add(toArchive[0]);
-            checkArchiveItem.add("true");
+    //        checkArchiveItem.add("true");
             int position = adapter.getPosition(toArchive[0]);
             archiveListView.setItemChecked(position, true);
           //  saveInFile();
@@ -81,7 +70,7 @@ public class ArchiveActivity extends Activity
         else
         {
             adapter.add(toArchive[0]);
-            checkArchiveItem.add("false");
+      //      checkArchiveItem.add("false");
            // saveInFile();
         }   
 
@@ -95,21 +84,21 @@ public class ArchiveActivity extends Activity
        // loadFromFile();
         if (archivedList == null)
             archivedList = new ArrayList<String>();
-        if (checkArchiveItem == null)
-            checkArchiveItem = new ArrayList<String>();
+        //if (checkArchiveItem == null)
+          //  checkArchiveItem = new ArrayList<String>();
         
         adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_multiple_choice, archivedList);
         archiveListView.setAdapter(adapter);
 
-        for (int i = 0; i < checkArchiveItem.size(); i++)
-        {
-            if (checkArchiveItem.get(i).equals("true") == true)
-            {
+        //for (int i = 0; i < checkArchiveItem.size(); i++)
+       // {
+         //   if (checkArchiveItem.get(i).equals("true") == true)
+           // {
                 //todoListView.setItemChecked(todoListView.get, true);
-            }
-        } 
-    }*/
+           // }
+        //} 
+    } */
 
     // taken from lonely twitter
  /*   private void loadFromFile()
@@ -289,6 +278,11 @@ public class ArchiveActivity extends Activity
         return super.onOptionsItemSelected(item);
     }
     
+	public void emailItem(MenuItem menu)
+	{
+		Intent intent = new Intent(ArchiveActivity.this, EmailActivity.class);
+		startActivity(intent);
+	}
     public static ArrayList<String> giveList()
     {
         return archivedList;

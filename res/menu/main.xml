@@ -8,8 +8,8 @@
         android:title="@string/action_settings"/>
     <item
         android:id="@+id/email_option"
-        android:onClick="emailItem"
-        android:title="@string/email_menu_title"/>
+        android:title="@string/email_menu_title"
+        android:onClick="emailItem"/>
     <item
         android:id="@+id/summary_option"
         android:title="@string/summary_menu_title"/>
