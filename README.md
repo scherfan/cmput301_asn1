@@ -16,5 +16,3 @@ choices.
 To delete a to do item simply click and hold on the intended item until the menu
 appears and then select delete. A warning will appear at that point in which case
 allowing you to confirm the deletion or change your mind by pressing cancel.
-
-test
