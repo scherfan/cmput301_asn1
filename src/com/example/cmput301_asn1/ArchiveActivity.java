@@ -1,6 +1,14 @@
 
 package com.example.cmput301_asn1;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -16,18 +24,25 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 public class ArchiveActivity extends Activity
 {
 
-    // private static final String FILENAME = "archivefile.sav";
+    private static final String ARCHIVEFILENAME = "archivefile.sav";
+
+    private static final String CHECKARCHIVEFILENAME = "checkarchivefile.sav";
 
     protected static ArrayList<String> archivedList;
 
-    // protected ArrayList<String> checkArchiveItem;
+    protected ArrayList<String> checkArchiveItem;
 
     protected ArrayAdapter<String> adapter;
 
@@ -38,82 +53,202 @@ public class ArchiveActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        // loadFromFile();
-        // if (archivedList == null)
-        archivedList = new ArrayList<String>();
-        // if (checkArchiveItem == null)
-        // checkArchiveItem = new ArrayList<String>();
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_archive);
+        
+        if (archivedList != null && checkArchiveItem != null)
+        {
+            loadFromArchiveFile();
+            loadFromCheckFile();
+        }
+        
+        if (archivedList == null)
+            archivedList = new ArrayList<String>();
+        if (checkArchiveItem == null)
+            checkArchiveItem = new ArrayList<String>();
 
         archiveListView = (ListView) findViewById(R.id.archive_listview);
+        archiveListView.setItemsCanFocus(false);
+        registerForContextMenu(archiveListView);
+        
         adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_multiple_choice, archivedList);
         archiveListView.setAdapter(adapter);
-        archiveListView.setItemsCanFocus(false);
-        registerForContextMenu(archiveListView);
 
         Intent intent = getIntent();
+        int position;
         if (intent.getStringArrayExtra(MainActivity.EXTRA_MESSAGE) != null)
         {
             String[] toArchive = intent
                     .getStringArrayExtra(MainActivity.EXTRA_MESSAGE);
             if (toArchive[1].equals("true") == true)
             {
-                adapter.add(toArchive[0]);
-                // checkArchiveItem.add("true");
-                int position = adapter.getPosition(toArchive[0]);
+                archivedList.add(toArchive[0]);
+                adapter.notifyDataSetChanged();
+                checkArchiveItem.add(toArchive[1]);
+                position = adapter.getPosition(toArchive[0]);
                 archiveListView.setItemChecked(position, true);
-                // saveInFile();
+                saveInArchiveFile();
+                saveInCheckFile();
             }
             else
             {
-                adapter.add(toArchive[0]);
-                // checkArchiveItem.add("false");
-                // saveInFile();
+                archivedList.add(toArchive[0]);
+                adapter.notifyDataSetChanged();
+                checkArchiveItem.add(toArchive[1]);
+                saveInArchiveFile();
+                saveInCheckFile();
+
+            }
+
+
+            for (int i = 0; i < checkArchiveItem.size(); i++)
+            {
+                if (checkArchiveItem.get(i).equals("true") == true)
+                    archiveListView.setItemChecked(i, true);
             }
         }
+        
+        archiveListView.setOnItemClickListener(new OnItemClickListener()
+        {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                    int position, long id)
+            {
+                CheckedTextView item = (CheckedTextView) view;
+                if (item.isChecked())
+                    checkArchiveItem.set(position, "true");
+                else
+                    checkArchiveItem.set(position, "false");
+                saveInCheckFile();
+            }
+        });
 
     }
 
+    private void saveInCheckFile()
+    {
+        // TODO Auto-generated method stub
+        try
+        {
+            FileOutputStream fos = openFileOutput(CHECKARCHIVEFILENAME, 0);
+            Gson gson = new Gson();
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            gson.toJson(checkArchiveItem, osw);
+            osw.flush();
+            fos.close();
+        }
+        catch (FileNotFoundException e)
+        { // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     // taken from lonelyTwitter
-    /*
-     * @Override protected void onStart() { super.onStart(); // loadFromFile();
-     * if (archivedList == null) archivedList = new ArrayList<String>(); //if
-     * (checkArchiveItem == null) // checkArchiveItem = new ArrayList<String>();
-     * 
-     * adapter = new ArrayAdapter<String>(this,
-     * android.R.layout.simple_list_item_multiple_choice, archivedList);
-     * archiveListView.setAdapter(adapter);
-     * 
-     * //for (int i = 0; i < checkArchiveItem.size(); i++) // { // if
-     * (checkArchiveItem.get(i).equals("true") == true) // {
-     * //todoListView.setItemChecked(todoListView.get, true); // } //} }
-     */
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        loadFromArchiveFile();
+        loadFromCheckFile();
+        if (archivedList == null)
+            archivedList = new ArrayList<String>();
+        if (checkArchiveItem == null)
+            checkArchiveItem = new ArrayList<String>();
+
+        adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_multiple_choice, archivedList);
+        archiveListView.setAdapter(adapter);
+
+        for (int i = 0; i < checkArchiveItem.size(); i++)
+        {
+            if (checkArchiveItem.get(i).equals("true") == true)
+                archiveListView.setItemChecked(i, true);
+        }
+    }
 
     // taken from lonely twitter
-    /*
-     * private void loadFromFile() { try { FileInputStream fis =
-     * openFileInput(FILENAME); BufferedReader in = new BufferedReader(new
-     * InputStreamReader(fis)); Gson gson = new Gson(); // Following was from:
-     * //
-     * https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google
-     * /gson/Gson.html Type listType = new TypeToken<ArrayList<String>>() {
-     * }.getType(); archivedList = gson.fromJson(in, listType); Type newlistType
-     * = new TypeToken<ArrayList<String>>() { }.getType(); checkArchiveItem =
-     * gson.fromJson(in, newlistType); } catch (FileNotFoundException e) { //
-     * TODO Auto-generated catch block e.printStackTrace(); } catch (IOException
-     * e) { // TODO Auto-generated catch block e.printStackTrace(); } }
-     * 
-     * // taken from lonelytwitter private void saveInFile() { try {
-     * FileOutputStream fos = openFileOutput(FILENAME, 0); Gson gson = new
-     * Gson(); OutputStreamWriter osw = new OutputStreamWriter(fos);
-     * gson.toJson(archivedList, osw); gson.toJson(checkArchiveItem, osw);
-     * osw.flush(); fos.close(); } catch (FileNotFoundException e) { // TODO
-     * Auto-generated catch block e.printStackTrace(); } catch (IOException e) {
-     * // TODO Auto-generated catch block e.printStackTrace(); } }
-     */
+
+    private void loadFromCheckFile()
+    {
+        // TODO Auto-generated method stub
+        try
+        {
+            FileInputStream fis = openFileInput(CHECKARCHIVEFILENAME);
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+            Gson gson = new Gson();
+            // Following was from:
+            // https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
+            Type listType = new TypeToken<ArrayList<String>>()
+            {
+            }.getType();
+            checkArchiveItem = gson.fromJson(in, listType);
+        }
+        catch (FileNotFoundException e)
+        { // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        { // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private void loadFromArchiveFile()
+    {
+        try
+        {
+            FileInputStream fis = openFileInput(ARCHIVEFILENAME);
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+            Gson gson = new Gson();
+            // Following was from:
+            // https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
+            Type listType = new TypeToken<ArrayList<String>>()
+            {
+            }.getType();
+            archivedList = gson.fromJson(in, listType);
+        }
+        catch (FileNotFoundException e)
+        { // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        { // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    // taken from lonelytwitter
+    private void saveInArchiveFile()
+    {
+        try
+        {
+            FileOutputStream fos = openFileOutput(ARCHIVEFILENAME, 0);
+            Gson gson = new Gson();
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            gson.toJson(archivedList, osw);
+            osw.flush();
+            fos.close();
+        }
+        catch (FileNotFoundException e)
+        { // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void onCreateContextMenu(ContextMenu Menu, View view,
