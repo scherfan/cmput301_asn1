@@ -18,5 +18,6 @@
     <string name="title_activity_summary">SummaryActivity</string>
     <string name="email_todo_title">TODO</string>
     <string name="email_archive_title">Archive</string>
+    <string name="email_button_label">Email Item(s)</string>
 
 </resources>

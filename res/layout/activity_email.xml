@@ -10,24 +10,13 @@
     tools:context="com.example.cmput301_asn1.EmailActivity" >
 
     <ListView
-        android:id="@+id/emailarchivelist"
-        android:layout_width="match_parent"
-        android:layout_height="227dp"
-        android:layout_column="0"
-        android:layout_gravity="left|bottom"
-        android:choiceMode="multipleChoice"
-        android:layout_row="4"
-        android:clickable="true" >
-    </ListView>
-
-    <ListView
         android:id="@+id/emailtodolist"
         android:layout_width="wrap_content"
-        android:layout_height="200dp"
+        android:layout_height="185dp"
         android:layout_column="0"
         android:layout_gravity="left|top"
-        android:choiceMode="multipleChoice"
         android:layout_row="2"
+        android:choiceMode="multipleChoice"
         android:clickable="true" >
     </ListView>
 
@@ -49,5 +38,25 @@
         android:layout_marginLeft="13dp"
         android:layout_row="1"
         android:text="@string/email_todo_title" />
+
+    <ListView
+        android:id="@+id/emailarchivelist"
+        android:layout_width="match_parent"
+        android:layout_height="185dp"
+        android:layout_column="0"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_row="4"
+        android:choiceMode="multipleChoice"
+        android:clickable="true" >
+    </ListView>
+
+    <Button
+        android:id="@+id/emailButton"
+        android:layout_width="324dp"
+        android:layout_column="0"
+        android:layout_gravity="left|top"
+        android:layout_row="5"
+        android:text="@string/email_button_label" 
+        android:onClick="emailItems"/>
 
 </GridLayout>

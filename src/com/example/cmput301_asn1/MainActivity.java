@@ -237,7 +237,7 @@ public class MainActivity extends Activity
 
 	public void emailItem(MenuItem menu)
 	{
-		Intent intent = new Intent(MainActivity.this, EmailActivity.class);
+		Intent intent = new Intent(this, EmailActivity.class);
 		startActivity(intent);
 	}
 
