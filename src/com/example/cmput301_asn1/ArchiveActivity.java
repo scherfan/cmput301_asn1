@@ -292,7 +292,9 @@ public class ArchiveActivity extends Activity
             setResult(Activity.RESULT_OK, backToMainIntent);
             archivedList.remove(position);
             adapter.notifyDataSetChanged();
-            // saveInFile();
+            checkArchiveItem.remove(position);
+            saveInArchiveFile();
+            saveInCheckFile();
             finish();
         }
         else
@@ -303,7 +305,9 @@ public class ArchiveActivity extends Activity
             setResult(Activity.RESULT_OK, backToMainIntent);
             archivedList.remove(position);
             adapter.notifyDataSetChanged();
-            // saveInFile();
+            checkArchiveItem.remove(position);
+            saveInArchiveFile();
+            saveInCheckFile();
             finish();
         }
     }
@@ -325,7 +329,9 @@ public class ArchiveActivity extends Activity
             {
                 archivedList.remove(finalPosition);
                 adapter.notifyDataSetChanged();
-                // saveInFile();
+                checkArchiveItem.remove(finalPosition);
+                 saveInArchiveFile();
+                 saveInCheckFile();
             }
 
         });
