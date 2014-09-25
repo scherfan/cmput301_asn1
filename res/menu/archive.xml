@@ -13,9 +13,4 @@
         android:id="@+id/summary_option"
         android:onClick="viewSummary"
         android:title="@string/summary_menu_title"/>
-    <item
-        android:id="@+id/view_archive_option"
-        android:onClick="viewArchive"
-        android:title="@string/view_archive_menu_title"/>
-
 </menu>

@@ -57,22 +57,25 @@ public class ArchiveActivity extends Activity
         registerForContextMenu(archiveListView);
 
         Intent intent = getIntent();
-        String[] toArchive = intent
-                .getStringArrayExtra(MainActivity.EXTRA_MESSAGE);
-        if (toArchive[1].equals("true") == true)
+        if (intent.getStringArrayExtra(MainActivity.EXTRA_MESSAGE) != null)
         {
-            adapter.add(toArchive[0]);
-    //        checkArchiveItem.add("true");
-            int position = adapter.getPosition(toArchive[0]);
-            archiveListView.setItemChecked(position, true);
-          //  saveInFile();
+            String[] toArchive = intent
+                    .getStringArrayExtra(MainActivity.EXTRA_MESSAGE);
+            if (toArchive[1].equals("true") == true)
+            {
+                adapter.add(toArchive[0]);
+                // checkArchiveItem.add("true");
+                int position = adapter.getPosition(toArchive[0]);
+                archiveListView.setItemChecked(position, true);
+                // saveInFile();
+            }
+            else
+            {
+                adapter.add(toArchive[0]);
+                // checkArchiveItem.add("false");
+                // saveInFile();
+            }
         }
-        else
-        {
-            adapter.add(toArchive[0]);
-      //      checkArchiveItem.add("false");
-           // saveInFile();
-        }   
 
     }
 
@@ -282,6 +285,11 @@ public class ArchiveActivity extends Activity
 	{
 		Intent intent = new Intent(ArchiveActivity.this, EmailActivity.class);
 		startActivity(intent);
+	}
+	public void viewSummary(MenuItem menu)
+	{
+	    Intent intent = new Intent(ArchiveActivity.this, SummaryActivity.class);
+	    startActivity(intent);
 	}
     public static ArrayList<String> giveList()
     {
