@@ -107,4 +107,16 @@ public class EmailActivity extends Activity
                 finalList.add(emailArchiveListView.getItemAtPosition(i).toString());
         }
     }
+    
+    public void viewArchive(MenuItem menu)
+    {
+        Intent intent = new Intent(EmailActivity.this, ArchiveActivity.class);
+        startActivity(intent);
+    }
+
+    public void viewSummary(MenuItem menu)
+    {
+        Intent intent = new Intent(EmailActivity.this, SummaryActivity.class);
+        startActivity(intent);
+    }
 }

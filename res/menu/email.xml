@@ -1,9 +1,17 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
+    <item
+        android:id="@+id/summary_option"
+        android:onClick="viewSummary"
+        android:title="@string/summary_menu_title"/>
+    <item
+        android:id="@+id/view_archive_option"
+        android:onClick="viewArchive"
+        android:title="@string/view_archive_menu_title"/>
 
 </menu>

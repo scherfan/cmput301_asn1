@@ -31,7 +31,7 @@ public class ArchiveActivity extends Activity
 
     protected ArrayAdapter<String> adapter;
 
-    protected ListView archiveListView;
+    protected static ListView archiveListView;
 
     public final static String EXTRA_UNARCHIVEDITEM = "com.example.cmput301_asn1";
 
@@ -286,7 +286,7 @@ public class ArchiveActivity extends Activity
 		Intent intent = new Intent(ArchiveActivity.this, EmailActivity.class);
 		startActivity(intent);
 	}
-	public void viewSummary(MenuItem menu)
+	public void viewSummaryFromArchive(MenuItem menu)
 	{
 	    Intent intent = new Intent(ArchiveActivity.this, SummaryActivity.class);
 	    startActivity(intent);
@@ -294,5 +294,29 @@ public class ArchiveActivity extends Activity
     public static ArrayList<String> giveList()
     {
         return archivedList;
+    }
+
+    public static int giveUnchecked()
+    {
+        if(archiveListView != null)
+            return (archiveListView.getCount() - archiveListView.getCheckedItemCount());
+        else
+            return 0;
+    }
+
+    public static int giveChecked()
+    {
+        if(archiveListView != null)
+            return archiveListView.getCheckedItemCount();
+        else
+            return 0;
+    }
+
+    public static int giveTotal()
+    {
+        if(archiveListView != null)
+            return archiveListView.getCount();
+        else
+            return 0;
     }
 }

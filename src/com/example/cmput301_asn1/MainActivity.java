@@ -56,7 +56,7 @@ public class MainActivity extends Activity
 
     protected EditText todoText;
 
-    protected ListView todoListView;
+    protected static ListView todoListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -243,7 +243,7 @@ public class MainActivity extends Activity
 
     public void viewArchive(MenuItem menu)
     {
-        Intent intent = new Intent(this, ArchiveActivity.class);
+        Intent intent = new Intent(MainActivity.this, ArchiveActivity.class);
         startActivity(intent);
     }
 
@@ -255,7 +255,7 @@ public class MainActivity extends Activity
 
     public void viewSummary(MenuItem menu)
     {
-        Intent intent = new Intent(this, SummaryActivity.class);
+        Intent intent = new Intent(MainActivity.this, SummaryActivity.class);
         startActivity(intent);
     }
     // taken from lonely twitter
@@ -280,4 +280,28 @@ public class MainActivity extends Activity
      * catch block e.printStackTrace(); } catch (IOException e) { // TODO
      * Auto-generated catch block e.printStackTrace(); } }
      */
+
+    public static int giveTotal()
+    {
+        if(todoListView != null)
+            return todoListView.getCount();
+        else
+            return 0;
+    }
+
+    public static int giveUnchecked()
+    {
+        if(todoListView != null)
+            return (todoListView.getCount() - todoListView.getCheckedItemCount());
+        else
+            return 0;
+    }
+
+    public static int giveChecked()
+    {
+        if(todoListView != null)
+            return todoListView.getCheckedItemCount();
+        else
+            return 0;
+    }
 }
