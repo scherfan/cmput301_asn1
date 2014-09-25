@@ -18,6 +18,14 @@
 
 package com.example.cmput301_asn1;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -32,31 +40,38 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 public class MainActivity extends Activity
 {
 
-    //private static final String TAG = "DEBUG";
+    // private static final String TAG = "DEBUG";
 
-    // private static final String FILENAME = "file.sav";
+    private static final String TODOFILENAME = "todofile.sav";
+
+    private static final String CHECKFILENAME = "checkfile.sav";
 
     public final static String EXTRA_MESSAGE = "com.example.cmput301_asn1";
 
+    protected static ListView todoListView;
+
     protected static ArrayList<String> todoList;
 
-    // protected ArrayList<String> checkListItem;
+    protected ArrayList<String> checkListItem;
 
-    protected ArrayAdapter<String> adapter;
+    protected ArrayAdapter<String> todoAdapter;
 
     protected EditText todoText;
-
-    protected static ListView todoListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -66,15 +81,6 @@ public class MainActivity extends Activity
 
         todoListView = (ListView) findViewById(R.id.todo_listview);
         registerForContextMenu(todoListView);
-        // loadFromFile();
-        // if (todoList == null)
-        todoList = new ArrayList<String>();
-        // if (checkListItem == null)
-        // checkListItem = new ArrayList<String>();
-
-        adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_multiple_choice, todoList);
-        todoListView.setAdapter(adapter);
 
         todoText = (EditText) findViewById(R.id.addTodoText);
         // initiates new array list to hold list items
@@ -98,39 +104,55 @@ public class MainActivity extends Activity
                 // setResult(RESULT_OK);
                 String todoString = todoText.getText().toString();
                 todoList.add(todoString);
-                adapter.notifyDataSetChanged();
-                // checkListItem.add("false");
-                // saveInFile();
+                todoAdapter.notifyDataSetChanged();
+                checkListItem.add("false");
+                saveInTodoFile();
+                saveInCheckFile();
             }
         });
 
-        /*
-         * todoListView.setOnItemClickListener(new OnItemClickListener() {
-         * 
-         * @Override public void onItemClick(AdapterView<?> parent, View view,
-         * int position, long id) { CheckedTextView item = (CheckedTextView)
-         * view; if (item.isChecked()) checkListItem.set(position, "true"); else
-         * checkListItem.set(position, "false"); saveInFile(); } });
-         */
+        todoListView.setOnItemClickListener(new OnItemClickListener()
+        {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                    int position, long id)
+            {
+                CheckedTextView item = (CheckedTextView) view;
+                if (item.isChecked())
+                    checkListItem.set(position, "true");
+                else
+                    checkListItem.set(position, "false");
+                saveInCheckFile();
+            }
+        });
 
     }
 
     // taken from lonelyTwitter
-    /*
-     * @Override protected void onStart() { super.onStart(); // loadFromFile();
-     * if (todoList == null) todoList = new ArrayList<String>(); // if
-     * (checkListItem == null) // checkListItem = new ArrayList<String>();
-     * 
-     * adapter = new ArrayAdapter<String>(this,
-     * android.R.layout.simple_list_item_multiple_choice, todoList);
-     * todoListView.setAdapter(adapter);
-     * 
-     * /* for(int i = 0; i < checkListItem.size();i++) {
-     * if(checkListItem.get(i).equals("true") == true) {
-     * //todoListView.setItemChecked(todoListView.get, true); } }
-     * 
-     * }
-     */
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        loadFromTodoFile();
+        loadFromCheckFile();
+
+        if (todoList == null)
+            todoList = new ArrayList<String>();
+        if (checkListItem == null)
+            checkListItem = new ArrayList<String>();
+
+        todoAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_multiple_choice, todoList);
+        todoListView.setAdapter(todoAdapter);
+
+        /*
+         * for(int i = 0; i < checkListItem.size();i++) {
+         * if(checkListItem.get(i).equals("true") == true) {
+         * //todoListView.setItemChecked(todoListView.get, true); } }
+         */
+
+    }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
@@ -192,17 +214,24 @@ public class MainActivity extends Activity
         {
             String[] toArchive = { todoList.get(position).toString(), "true" };
             intent.putExtra(EXTRA_MESSAGE, toArchive);
+            todoList.remove(position);
+            todoAdapter.notifyDataSetChanged();
+            saveInTodoFile();
+            checkListItem.remove(position);
+            saveInCheckFile();
             startActivity(intent);
         }
         else
         {
             String[] toArchive = { todoList.get(position).toString(), "false" };
             intent.putExtra(EXTRA_MESSAGE, toArchive);
+            todoList.remove(position);
+            todoAdapter.notifyDataSetChanged();
+            saveInTodoFile();
+            checkListItem.remove(position);
+            saveInCheckFile();
             startActivity(intent);
         }
-        todoList.remove(position);
-        adapter.notifyDataSetChanged();
-        // saveInFile();
     }
 
     // Adapted from student-picker
@@ -219,8 +248,10 @@ public class MainActivity extends Activity
             public void onClick(DialogInterface dialog, int which)
             {
                 todoList.remove(finalPosition);
-                adapter.notifyDataSetChanged();
-                // saveInFile();
+                todoAdapter.notifyDataSetChanged();
+                saveInTodoFile();
+                checkListItem.remove(finalPosition);
+                saveInCheckFile();
             }
 
         });
@@ -258,32 +289,113 @@ public class MainActivity extends Activity
         Intent intent = new Intent(MainActivity.this, SummaryActivity.class);
         startActivity(intent);
     }
+
     // taken from lonely twitter
-    /*
-     * private void loadFromFile() { try { FileInputStream fis =
-     * openFileInput(FILENAME); BufferedReader in = new BufferedReader(new
-     * InputStreamReader(fis)); Gson gson = new Gson(); // Following was from:
-     * //
-     * https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google
-     * /gson/Gson.html Type listType = new TypeToken<ArrayList<String>>() {
-     * }.getType(); todoList = gson.fromJson(in, listType); Type newlistType =
-     * new TypeToken<ArrayList<String>>() { }.getType(); checkListItem =
-     * gson.fromJson(in, newlistType); } catch (FileNotFoundException e) { //
-     * TODO Auto-generated catch block e.printStackTrace(); } catch (IOException
-     * e) { // TODO Auto-generated catch block e.printStackTrace(); } }
-     * 
-     * // taken from lonelytwitter private void saveInFile() { try {
-     * FileOutputStream fos = openFileOutput(FILENAME, 0); Gson gson = new
-     * Gson(); OutputStreamWriter osw = new OutputStreamWriter(fos);
-     * gson.toJson(todoList, osw); gson.toJson(checkListItem, osw); osw.flush();
-     * fos.close(); } catch (FileNotFoundException e) { // TODO Auto-generated
-     * catch block e.printStackTrace(); } catch (IOException e) { // TODO
-     * Auto-generated catch block e.printStackTrace(); } }
-     */
+
+    private void loadFromTodoFile()
+    {
+        try
+        {
+            FileInputStream fis = openFileInput(TODOFILENAME);
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+            Gson gson = new Gson();
+            // Following was from:
+            // https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
+            Type listType = new TypeToken<ArrayList<String>>()
+            {
+            }.getType();
+            todoList = gson.fromJson(in, listType);
+            // Type newlistType = new TypeToken<ArrayList<String>>()
+            // {
+
+            // }.getType();
+            // checkListItem = gson.fromJson(in, newlistType);
+        }
+        catch (FileNotFoundException e)
+        { // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        { // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    // taken from lonelytwitter
+    private void saveInTodoFile()
+    {
+        try
+        {
+            FileOutputStream fos = openFileOutput(TODOFILENAME, 0);
+            Gson gson = new Gson();
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            gson.toJson(todoList, osw);
+            // gson.toJson(checkListItem, osw);
+            osw.flush();
+            fos.close();
+        }
+        catch (FileNotFoundException e)
+        { // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        { // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    // taken from lonely twitter
+
+    private void loadFromCheckFile()
+    {
+        try
+        {
+            FileInputStream fis = openFileInput(CHECKFILENAME);
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+            Gson gson = new Gson();
+            // Following was from:
+            // https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
+            Type listType = new TypeToken<ArrayList<String>>()
+            {
+
+            }.getType();
+            checkListItem = gson.fromJson(in, listType);
+        }
+        catch (FileNotFoundException e)
+        { // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        { // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    // taken from lonelytwitter
+    private void saveInCheckFile()
+    {
+        try
+        {
+            FileOutputStream fos = openFileOutput(CHECKFILENAME, 0);
+            Gson gson = new Gson();
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            gson.toJson(checkListItem, osw);
+            osw.flush();
+            fos.close();
+        }
+        catch (FileNotFoundException e)
+        { // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        { // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
     public static int giveTotal()
     {
-        if(todoListView != null)
+        if (todoListView != null)
             return todoListView.getCount();
         else
             return 0;
@@ -291,15 +403,16 @@ public class MainActivity extends Activity
 
     public static int giveUnchecked()
     {
-        if(todoListView != null)
-            return (todoListView.getCount() - todoListView.getCheckedItemCount());
+        if (todoListView != null)
+            return (todoListView.getCount() - todoListView
+                    .getCheckedItemCount());
         else
             return 0;
     }
 
     public static int giveChecked()
     {
-        if(todoListView != null)
+        if (todoListView != null)
             return todoListView.getCheckedItemCount();
         else
             return 0;
