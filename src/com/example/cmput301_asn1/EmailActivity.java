@@ -41,8 +41,8 @@ public class EmailActivity extends Activity
         eTodoList = new ArrayList<String>();
         eArchiveList = new ArrayList<String>();
         
-        if (MainActivity.giveList() != null)
-            eTodoList = MainActivity.giveList();
+        if (MainActivityHelpers.giveList() != null)
+            eTodoList = MainActivityHelpers.giveList();
         if (ArchiveActivity.giveList() != null)
             eArchiveList = ArchiveActivity.giveList();
         

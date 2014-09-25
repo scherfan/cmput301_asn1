@@ -36,405 +36,423 @@ import com.google.gson.reflect.TypeToken;
 public class ArchiveActivity extends Activity
 {
 
-    private static final String ARCHIVEFILENAME = "archivefile.sav";
+	protected static final String ARCHIVEFILENAME = "archivefile.sav";
 
-    private static final String CHECKARCHIVEFILENAME = "checkarchivefile.sav";
+	protected static final String CHECKARCHIVEFILENAME = "checkarchivefile.sav";
 
-    protected static ArrayList<String> archivedList;
+	protected static ArrayList<String> archivedList;
 
-    protected ArrayList<String> checkArchiveItem;
+	protected static ArrayList<String> checkArchiveItem;
 
-    protected ArrayAdapter<String> adapter;
+	protected static ArrayAdapter<String> adapter;
 
-    protected static ListView archiveListView;
+	protected static ListView archiveListView;
 
-    public final static String EXTRA_MESSAGE = "com.example.cmput301_asn1";
+	public final static String EXTRA_MESSAGE = "com.example.cmput301_asn1";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_archive);
-        
-        if (archivedList != null && checkArchiveItem != null)
-        {
-            loadFromArchiveFile();
-            loadFromCheckFile();
-        }
-        
-        if (archivedList == null)
-            archivedList = new ArrayList<String>();
-        if (checkArchiveItem == null)
-            checkArchiveItem = new ArrayList<String>();
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_archive);
+		if (archivedList == null)
+			archivedList = new ArrayList<String>();
+		if (checkArchiveItem == null)
+			checkArchiveItem = new ArrayList<String>();
 
-        archiveListView = (ListView) findViewById(R.id.archive_listview);
-        archiveListView.setItemsCanFocus(false);
-        registerForContextMenu(archiveListView);
-        
-        adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_multiple_choice, archivedList);
-        archiveListView.setAdapter(adapter);
+		if (archivedList == null || checkArchiveItem == null)
+		{
+			Intent intent = getIntent();
+			int position;
+			if (intent.getStringArrayExtra(MainActivity.EXTRA_MESSAGE) != null)
+			{
+				String[] toArchive = intent
+				        .getStringArrayExtra(MainActivity.EXTRA_MESSAGE);
+				if (toArchive[1].equals("true") == true)
+				{
+					archivedList.add(toArchive[0]);
+					adapter.notifyDataSetChanged();
+					checkArchiveItem.add(toArchive[1]);
+					position = adapter.getPosition(toArchive[0]);
+					archiveListView.setItemChecked(position, true);
+					saveInArchiveFile();
+					saveInCheckFile();
+				}
+				else
+				{
+					archivedList.add(toArchive[0]);
+					adapter.notifyDataSetChanged();
+					checkArchiveItem.add(toArchive[1]);
+					saveInArchiveFile();
+					saveInCheckFile();
 
-       /* Intent intent = getIntent();
-        int position;
-        if (intent.getStringArrayExtra(MainActivity.EXTRA_MESSAGE) != null)
-        {
-            String[] toArchive = intent
-                    .getStringArrayExtra(MainActivity.EXTRA_MESSAGE);
-            if (toArchive[1].equals("true") == true)
-            {
-                archivedList.add(toArchive[0]);
-                adapter.notifyDataSetChanged();
-                checkArchiveItem.add(toArchive[1]);
-                position = adapter.getPosition(toArchive[0]);
-                archiveListView.setItemChecked(position, true);
-                saveInArchiveFile();
-                saveInCheckFile();
-            }
-            else
-            {
-                archivedList.add(toArchive[0]);
-                adapter.notifyDataSetChanged();
-                checkArchiveItem.add(toArchive[1]);
-                saveInArchiveFile();
-                saveInCheckFile();
-
-            }
+				}
+			}
+		}
 
 
-            for (int i = 0; i < checkArchiveItem.size(); i++)
-            {
-                if (checkArchiveItem.get(i).equals("true") == true)
-                    archiveListView.setItemChecked(i, true);
-            }
-        } */
-        
-        archiveListView.setOnItemClickListener(new OnItemClickListener()
-        {
+		archiveListView = (ListView) findViewById(R.id.archive_listview);
+		archiveListView.setItemsCanFocus(false);
+		registerForContextMenu(archiveListView);
 
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                    int position, long id)
-            {
-                CheckedTextView item = (CheckedTextView) view;
-                if (item.isChecked())
-                    checkArchiveItem.set(position, "true");
-                else
-                    checkArchiveItem.set(position, "false");
-                saveInCheckFile();
-            }
-        });
 
-    }
+		archiveListView.setOnItemClickListener(new OnItemClickListener()
+		{
 
-    private void saveInCheckFile()
-    {
-        // TODO Auto-generated method stub
-        try
-        {
-            FileOutputStream fos = openFileOutput(CHECKARCHIVEFILENAME, 0);
-            Gson gson = new Gson();
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            gson.toJson(checkArchiveItem, osw);
-            osw.flush();
-            fos.close();
-        }
-        catch (FileNotFoundException e)
-        { // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+			        int position, long id)
+			{
+				CheckedTextView item = (CheckedTextView) view;
+				if (item.isChecked())
+					checkArchiveItem.set(position, "true");
+				else
+					checkArchiveItem.set(position, "false");
+				saveInCheckFile();
+			}
+		});
 
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	}
 
-    // taken from lonelyTwitter
+	private void saveInCheckFile()
+	{
+		// TODO Auto-generated method stub
+		try
+		{
+			FileOutputStream fos = openFileOutput(CHECKARCHIVEFILENAME, 0);
+			Gson gson = new Gson();
+			OutputStreamWriter osw = new OutputStreamWriter(fos);
+			gson.toJson(checkArchiveItem, osw);
+			osw.flush();
+			fos.close();
+		}
+		catch (FileNotFoundException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
 
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
-        loadFromArchiveFile();
-        loadFromCheckFile();
-        if (archivedList == null)
-            archivedList = new ArrayList<String>();
-        if (checkArchiveItem == null)
-            checkArchiveItem = new ArrayList<String>();
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-        adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_multiple_choice, archivedList);
-        archiveListView.setAdapter(adapter);
+	// taken from lonelyTwitter
 
-        for (int i = 0; i < checkArchiveItem.size(); i++)
-        {
-            if (checkArchiveItem.get(i).equals("true") == true)
-                archiveListView.setItemChecked(i, true);
-        }
-        
-        Intent intent = getIntent();
-        int position;
-        if (intent.getStringArrayExtra(MainActivity.EXTRA_MESSAGE) != null)
-        {
-            String[] toArchive = intent
-                    .getStringArrayExtra(MainActivity.EXTRA_MESSAGE);
-            if (toArchive[1].equals("true") == true)
-            {
-                archivedList.add(toArchive[0]);
-                adapter.notifyDataSetChanged();
-                checkArchiveItem.add(toArchive[1]);
-                position = adapter.getPosition(toArchive[0]);
-                archiveListView.setItemChecked(position, true);
-                saveInArchiveFile();
-                saveInCheckFile();
-            }
-            else
-            {
-                archivedList.add(toArchive[0]);
-                adapter.notifyDataSetChanged();
-                checkArchiveItem.add(toArchive[1]);
-                saveInArchiveFile();
-                saveInCheckFile();
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		loadFromArchiveFile();
+		loadFromCheckFile();
+		if (archivedList == null)
+			archivedList = new ArrayList<String>();
+		if (checkArchiveItem == null)
+			checkArchiveItem = new ArrayList<String>();
 
-            }
-        }
-    }
+		adapter = new ArrayAdapter<String>(this,
+		        android.R.layout.simple_list_item_multiple_choice, archivedList);
+		archiveListView.setAdapter(adapter);
 
-    // taken from lonely twitter
+		for (int i = 0; i < checkArchiveItem.size(); i++)
+		{
+			if (checkArchiveItem.get(i).equals("true") == true)
+				archiveListView.setItemChecked(i, true);
+		}
+	}
 
-    private void loadFromCheckFile()
-    {
-        // TODO Auto-generated method stub
-        try
-        {
-            FileInputStream fis = openFileInput(CHECKARCHIVEFILENAME);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
-            Gson gson = new Gson();
-            // Following was from:
-            // https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
-            Type listType = new TypeToken<ArrayList<String>>()
-            {
-            }.getType();
-            checkArchiveItem = gson.fromJson(in, listType);
-        }
-        catch (FileNotFoundException e)
-        { // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        { // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	// taken from lonely twitter
 
-    private void loadFromArchiveFile()
-    {
-        try
-        {
-            FileInputStream fis = openFileInput(ARCHIVEFILENAME);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
-            Gson gson = new Gson();
-            // Following was from:
-            // https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
-            Type listType = new TypeToken<ArrayList<String>>()
-            {
-            }.getType();
-            archivedList = gson.fromJson(in, listType);
-        }
-        catch (FileNotFoundException e)
-        { // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        { // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	private void loadFromCheckFile()
+	{
+		// TODO Auto-generated method stub
+		try
+		{
+			FileInputStream fis = openFileInput(CHECKARCHIVEFILENAME);
+			BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+			Gson gson = new Gson();
+			// Following was from:
+			// https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
+			Type listType = new TypeToken<ArrayList<String>>()
+			{
+			}.getType();
+			checkArchiveItem = gson.fromJson(in, listType);
+		}
+		catch (FileNotFoundException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (@SuppressWarnings("hiding") IOException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-    // taken from lonelytwitter
-    private void saveInArchiveFile()
-    {
-        try
-        {
-            FileOutputStream fos = openFileOutput(ARCHIVEFILENAME, 0);
-            Gson gson = new Gson();
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            gson.toJson(archivedList, osw);
-            osw.flush();
-            fos.close();
-        }
-        catch (FileNotFoundException e)
-        { // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
+	private void loadFromArchiveFile()
+	{
+		try
+		{
+			FileInputStream fis = openFileInput(ARCHIVEFILENAME);
+			BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+			Gson gson = new Gson();
+			// Following was from:
+			// https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
+			Type listType = new TypeToken<ArrayList<String>>()
+			{
+			}.getType();
+			archivedList = gson.fromJson(in, listType);
+		}
+		catch (FileNotFoundException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (@SuppressWarnings("hiding") IOException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	// taken from lonelytwitter
+	private void saveInArchiveFile()
+	{
+		try
+		{
+			FileOutputStream fos = openFileOutput(ARCHIVEFILENAME, 0);
+			Gson gson = new Gson();
+			OutputStreamWriter osw = new OutputStreamWriter(fos);
+			gson.toJson(archivedList, osw);
+			osw.flush();
+			fos.close();
+		}
+		catch (FileNotFoundException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
 
-    @Override
-    public void onCreateContextMenu(ContextMenu Menu, View view,
-            ContextMenuInfo MenuInfo)
-    {
-        super.onCreateContextMenu(Menu, view, MenuInfo);
-        MenuInflater Inflater = getMenuInflater();
-        Inflater.inflate(R.menu.archive_context, Menu);
-    }
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item)
-    {
-        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
-                .getMenuInfo();
-        int position = info.position;
-        View v = info.targetView;
-        switch (item.getItemId())
-        {
-            case R.id.delete_option:
-                deleteItem(position);
-                return true;
-            case R.id.unarchive_option:
-                unarchiveItem(position, v);
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }
+	// taken from lonelytwitter
+	private void saveInTodoFile()
+	{
+		try
+		{
+			FileOutputStream fos = openFileOutput(MainActivity.TODOFILENAME, 0);
+			Gson gson = new Gson();
+			OutputStreamWriter osw = new OutputStreamWriter(fos);
+			gson.toJson(MainActivity.todoList, osw);
+			osw.flush();
+			fos.close();
+		}
+		catch (FileNotFoundException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
 
-    private void unarchiveItem(int position, View v)
-    {
-        Intent backToMainIntent = new Intent();
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-        CheckedTextView item = (CheckedTextView) v;
-        if (item.isChecked())
-        {
-            String[] unArchive = { archivedList.get(position).toString(),
-                    "true" };
-            backToMainIntent.putExtra(EXTRA_MESSAGE, unArchive);
-            setResult(Activity.RESULT_OK, backToMainIntent);
-            archivedList.remove(position);
-            adapter.notifyDataSetChanged();
-            checkArchiveItem.remove(position);
-            saveInArchiveFile();
-            saveInCheckFile();
-            finish();
-        }
-        else
-        {
-            String[] unArchive = { archivedList.get(position).toString(),
-                    "false" };
-            backToMainIntent.putExtra(EXTRA_MESSAGE, unArchive);
-            setResult(Activity.RESULT_OK, backToMainIntent);
-            archivedList.remove(position);
-            adapter.notifyDataSetChanged();
-            checkArchiveItem.remove(position);
-            saveInArchiveFile();
-            saveInCheckFile();
-            finish();
-        }
-    }
+	// taken from lonelytwitter
+	private void saveInTodoCheckFile()
+	{
+		try
+		{
+			FileOutputStream fos = openFileOutput(MainActivity.CHECKFILENAME, 0);
+			Gson gson = new Gson();
+			OutputStreamWriter osw = new OutputStreamWriter(fos);
+			gson.toJson(MainActivity.checkListItem, osw);
+			osw.flush();
+			fos.close();
+		}
+		catch (FileNotFoundException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
 
-    // Adapted from student-picker
-    private void deleteItem(int position)
-    {
-        AlertDialog.Builder deladb = new AlertDialog.Builder(
-                ArchiveActivity.this);
-        deladb.setMessage("Delete " + archivedList.get(position).toString()
-                + "?");
-        deladb.setCancelable(true);
-        final int finalPosition = position;
-        deladb.setPositiveButton("Delete", new OnClickListener()
-        {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                archivedList.remove(finalPosition);
-                adapter.notifyDataSetChanged();
-                checkArchiveItem.remove(finalPosition);
-                 saveInArchiveFile();
-                 saveInCheckFile();
-            }
+	@Override
+	public void onCreateContextMenu(ContextMenu Menu, View view,
+	        ContextMenuInfo MenuInfo)
+	{
+		super.onCreateContextMenu(Menu, view, MenuInfo);
+		MenuInflater Inflater = getMenuInflater();
+		Inflater.inflate(R.menu.archive_context, Menu);
+	}
 
-        });
-        deladb.setNegativeButton("Cancel", new OnClickListener()
-        {
+	@Override
+	public boolean onContextItemSelected(MenuItem item)
+	{
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+		        .getMenuInfo();
+		int position = info.position;
+		View v = info.targetView;
+		switch (item.getItemId())
+		{
+			case R.id.delete_option:
+				deleteItem(position);
+				return true;
+			case R.id.unarchive_option:
+				unarchiveItem(position, v);
+				return true;
+			default:
+				return super.onContextItemSelected(item);
+		}
+	}
 
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                // Cancels.
-            }
-        });
-        deladb.show();
-    }
+	private void unarchiveItem(int position, View v)
+	{
+		// Intent backToMainIntent = new Intent();
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.archive, menu);
-        return true;
-    }
+		CheckedTextView item = (CheckedTextView) v;
+		if (item.isChecked())
+		{
+			String[] unArchive = { archivedList.get(position).toString(),
+			        "true" };
+			// backToMainIntent.putExtra(EXTRA_MESSAGE, unArchive);
+			// setResult(Activity.RESULT_OK, backToMainIntent);
+			MainActivity.todoList.add(unArchive[0]);
+			MainActivity.todoAdapter.notifyDataSetChanged();
+			MainActivity.checkListItem.add(unArchive[1]);
+			saveInTodoCheckFile();
+			saveInTodoFile();
+			archivedList.remove(position);
+			adapter.notifyDataSetChanged();
+			checkArchiveItem.remove(position);
+			saveInArchiveFile();
+			saveInCheckFile();
+			finish();
+		}
+		else
+		{
+			String[] unArchive = { archivedList.get(position).toString(),
+			        "false" };
+			// backToMainIntent.putExtra(EXTRA_MESSAGE, unArchive);
+			// setResult(Activity.RESULT_OK, backToMainIntent);
+			MainActivity.todoList.add(unArchive[0]);
+			MainActivity.todoAdapter.notifyDataSetChanged();
+			MainActivity.checkListItem.add(unArchive[1]);
+			saveInTodoCheckFile();
+			saveInTodoFile();
+			archivedList.remove(position);
+			adapter.notifyDataSetChanged();
+			checkArchiveItem.remove(position);
+			saveInArchiveFile();
+			saveInCheckFile();
+			finish();
+		}
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings)
-        {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+	// Adapted from student-picker
+	private void deleteItem(int position)
+	{
+		AlertDialog.Builder deladb = new AlertDialog.Builder(
+		        ArchiveActivity.this);
+		deladb.setMessage("Delete " + archivedList.get(position).toString()
+		        + "?");
+		deladb.setCancelable(true);
+		final int finalPosition = position;
+		deladb.setPositiveButton("Delete", new OnClickListener()
+		{
 
-    public void emailItemFromArchive(MenuItem menu)
-    {
-        Intent intent = new Intent(ArchiveActivity.this, EmailActivity.class);
-        startActivity(intent);
-    }
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				archivedList.remove(finalPosition);
+				adapter.notifyDataSetChanged();
+				checkArchiveItem.remove(finalPosition);
+				saveInArchiveFile();
+				saveInCheckFile();
+			}
 
-    public void viewSummaryFromArchive(MenuItem menu)
-    {
-        Intent intent = new Intent(ArchiveActivity.this, SummaryActivity.class);
-        startActivity(intent);
-    }
+		});
+		deladb.setNegativeButton("Cancel", new OnClickListener()
+		{
 
-    public static ArrayList<String> giveList()
-    {
-        return archivedList;
-    }
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				// Cancels.
+			}
+		});
+		deladb.show();
+	}
 
-    public static int giveUnchecked()
-    {
-        if (archiveListView != null)
-            return (archiveListView.getCount() - archiveListView
-                    .getCheckedItemCount());
-        else
-            return 0;
-    }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.archive, menu);
+		return true;
+	}
 
-    public static int giveChecked()
-    {
-        if (archiveListView != null)
-            return archiveListView.getCheckedItemCount();
-        else
-            return 0;
-    }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings)
+		{
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
-    public static int giveTotal()
-    {
-        if (archiveListView != null)
-            return archiveListView.getCount();
-        else
-            return 0;
-    }
+	public void emailItemFromArchive(MenuItem menu)
+	{
+		Intent intent = new Intent(ArchiveActivity.this, EmailActivity.class);
+		startActivity(intent);
+	}
+
+	public void viewSummaryFromArchive(MenuItem menu)
+	{
+		Intent intent = new Intent(ArchiveActivity.this, SummaryActivity.class);
+		startActivity(intent);
+	}
+
+	public static ArrayList<String> giveList()
+	{
+		return archivedList;
+	}
+
+	public static int giveUnchecked()
+	{
+		if (archiveListView != null)
+			return (archiveListView.getCount() - archiveListView
+			        .getCheckedItemCount());
+		else
+			return 0;
+	}
+
+	public static int giveChecked()
+	{
+		if (archiveListView != null)
+			return archiveListView.getCheckedItemCount();
+		else
+			return 0;
+	}
+
+	public static int giveTotal()
+	{
+		if (archiveListView != null)
+			return archiveListView.getCount();
+		else
+			return 0;
+	}
 }

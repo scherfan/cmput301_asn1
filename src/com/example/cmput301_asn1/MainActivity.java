@@ -34,6 +34,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -55,397 +56,442 @@ import com.google.gson.reflect.TypeToken;
 public class MainActivity extends Activity
 {
 
-    // private static final String TAG = "DEBUG";
+	private static final String TAG = "DEBUG";
 
-    private static final String TODOFILENAME = "todofile.sav";
+	// save file for the list of todos
+	protected static final String TODOFILENAME = "todofile.sav";
 
-    private static final String CHECKFILENAME = "checkfile.sav";
+	// save file to track items that are checked or not
+	protected static final String CHECKFILENAME = "checkfile.sav";
 
-    public final static String EXTRA_MESSAGE = "com.example.cmput301_asn1";
+	public final static String EXTRA_MESSAGE = "com.example.cmput301_asn1";
 
-    protected static ListView todoListView;
+	protected static ListView todoListView;
 
-    protected static ArrayList<String> todoList;
+	// Stores todo items
+	protected static ArrayList<String> todoList;
 
-    protected static ArrayList<String> checkListItem;
+	// Stores strings to keep track of checked items
+	protected static ArrayList<String> checkListItem;
 
-    protected ArrayAdapter<String> todoAdapter;
+	protected static ArrayAdapter<String> todoAdapter;
 
-    protected EditText todoText;
+	protected EditText todoText;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 
-        todoListView = (ListView) findViewById(R.id.todo_listview);
-        registerForContextMenu(todoListView);
+		// Initializes the listview and registers it for the context menu
+		todoListView = (ListView) findViewById(R.id.todo_listview);
+		registerForContextMenu(todoListView);
+		todoListView.setItemsCanFocus(false);
 
-        todoText = (EditText) findViewById(R.id.addTodoText);
-        // initiates new array list to hold list items
-        // also an adapter that has check boxes for the list
-        // and a button to add items to the list
+		todoText = (EditText) findViewById(R.id.addTodoText);
+		Button add_button = (Button) findViewById(R.id.addButton); // Add button
 
-        todoListView.setItemsCanFocus(false);
+		/*
+		 * Waits for add button to be clicked and then converts text in the edit
+		 * test to a string and puts it in the array list. CheckListItem is used
+		 * as storage to keep track if a todo is checked or not this way it
+		 * keeps the checks. Initializes it as unchecked then saves in correct
+		 * files.
+		 */
+		add_button.setOnClickListener(new View.OnClickListener()
+		{
 
-        Button add_button = (Button) findViewById(R.id.addButton);
-        // initiate a list view for the array list and its check boxes
+			@Override
+			public void onClick(View v)
+			{
+				String todoString = todoText.getText().toString();
+				todoList.add(todoString);
+				todoAdapter.notifyDataSetChanged();
+				checkListItem.add("false");
+				saveInTodoFile();
+				saveInCheckFile();
+			}
+		});
 
-        // waits for add button to be clicked and then
-        // converts text in the edit test to a string and
-        // puts it in the array list
-        add_button.setOnClickListener(new View.OnClickListener()
-        {
+		/*
+		 * Listens to see if an item is checked off and updates the check
+		 * tracking list.
+		 */
+		todoListView.setOnItemClickListener(new OnItemClickListener()
+		{
 
-            @Override
-            public void onClick(View v)
-            {
-                String todoString = todoText.getText().toString();
-                todoList.add(todoString);
-                todoAdapter.notifyDataSetChanged();
-                checkListItem.add("false");
-                saveInTodoFile();
-                saveInCheckFile();
-            }
-        });
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+			        int position, long id)
+			{
+				CheckedTextView item = (CheckedTextView) view;
+				if (item.isChecked())
+					checkListItem.set(position, "true");
+				else
+					checkListItem.set(position, "false");
+				saveInCheckFile();
+			}
+		});
 
-        todoListView.setOnItemClickListener(new OnItemClickListener()
-        {
+	}
 
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                    int position, long id)
-            {
-                CheckedTextView item = (CheckedTextView) view;
-                if (item.isChecked())
-                    checkListItem.set(position, "true");
-                else
-                    checkListItem.set(position, "false");
-                saveInCheckFile();
-            }
-        });
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onStart() Loads items and initializes adapter,
+	 * also checks items if they were checked earlier. Idea and style borrowed
+	 * from the work done in the lab. https://github.com/joshua2ua/lonelyTwitter
+	 */
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		loadFromTodoFile();
+		loadFromCheckFile();
 
-    }
+		if (todoList == null)
+			todoList = new ArrayList<String>();
+		if (checkListItem == null)
+			checkListItem = new ArrayList<String>();
 
-    // taken from lonelyTwitter
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
-        loadFromTodoFile();
-        loadFromCheckFile();
+		todoAdapter = new ArrayAdapter<String>(this,
+		        android.R.layout.simple_list_item_multiple_choice, todoList);
+		todoListView.setAdapter(todoAdapter);
 
-        if (todoList == null)
-            todoList = new ArrayList<String>();
-        if (checkListItem == null)
-            checkListItem = new ArrayList<String>();
+		for (int i = 0; i < checkListItem.size(); i++)
+		{
+			if (checkListItem.get(i).equals("true") == true)
+				todoListView.setItemChecked(i, true);
+		}
 
-        todoAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_multiple_choice, todoList);
-        todoListView.setAdapter(todoAdapter);
+	}
 
-        for (int i = 0; i < checkListItem.size(); i++)
-        {
-            if (checkListItem.get(i).equals("true") == true)
-                todoListView.setItemChecked(i, true);
-        }
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+	        ContextMenuInfo menuInfo)
+	{
+		super.onCreateContextMenu(menu, v, menuInfo);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.context_menu, menu);
+	}
 
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onContextItemSelected(android.view.MenuItem) If
+	 * one of the context items gets clicked this method delegates to the proper
+	 * method.
+	 */
+	@Override
+	public boolean onContextItemSelected(MenuItem item)
+	{
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+		        .getMenuInfo();
+		int position = info.position;
+		View v = info.targetView;
+		switch (item.getItemId())
+		{
+			case R.id.delete_option:
+				deleteItem(position);
+				return true;
+			case R.id.archive_option:
+				archiveItem(position, v);
+				return true;
+			default:
+				return super.onContextItemSelected(item);
+		}
+	}
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-            ContextMenuInfo menuInfo)
-    {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.context_menu, menu);
-    }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item)
-    {
-        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
-                .getMenuInfo();
-        int position = info.position;
-        View v = info.targetView;
-        switch (item.getItemId())
-        {
-            case R.id.delete_option:
-                deleteItem(position);
-                return true;
-            case R.id.archive_option:
-                archiveItem(position, v);
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings)
+		{
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+	private void archiveItem(int position, View v)
+	{
+		Intent intent = new Intent(MainActivity.this, ArchiveActivity.class);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings)
-        {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+		CheckedTextView item = (CheckedTextView) v;
+		if (ArchiveActivity.archivedList != null
+		        && ArchiveActivity.checkArchiveItem != null)
+		{
+			if (item.isChecked())
+			{
 
-    private void archiveItem(int position, View v)
-    {
-        Intent intent = new Intent(MainActivity.this, ArchiveActivity.class);
+				String[] toArchive = { todoList.get(position).toString(),
+				        "true" };
+				todoList.remove(position);
+				todoAdapter.notifyDataSetChanged();
+				saveInTodoFile();
+				checkListItem.remove(position);
+				saveInCheckFile();
+				ArchiveActivity.archivedList.add(toArchive[0]);
+				ArchiveActivity.adapter.notifyDataSetChanged();
+				saveInArchiveFile();
+				ArchiveActivity.checkArchiveItem.add(toArchive[1]);
+				saveInArchiveCheckFile();
+				startActivity(intent);
+			}
+			else
+			{
+				String[] toArchive = { todoList.get(position).toString(),
+				        "false" };
+				todoList.remove(position);
+				todoAdapter.notifyDataSetChanged();
+				saveInTodoFile();
+				checkListItem.remove(position);
+				saveInCheckFile();
+				ArchiveActivity.archivedList.add(toArchive[0]);
+				ArchiveActivity.adapter.notifyDataSetChanged();
+				saveInArchiveFile();
+				ArchiveActivity.checkArchiveItem.add(toArchive[1]);
+				saveInArchiveCheckFile();
+				startActivity(intent);
+			}
+		}
+		else if (ArchiveActivity.archivedList == null
+		        && ArchiveActivity.checkArchiveItem == null)
+		{
+			Log.v(TAG, "AM i gettting here?");
+			if (item.isChecked())
+			{
 
-        CheckedTextView item = (CheckedTextView) v;
-        if (item.isChecked())
-        {
-            String[] toArchive = { todoList.get(position).toString(), "true" };
-            intent.putExtra(EXTRA_MESSAGE, toArchive);
-            todoList.remove(position);
-            todoAdapter.notifyDataSetChanged();
-            saveInTodoFile();
-            checkListItem.remove(position);
-            saveInCheckFile();
-            startActivityForResult(intent, 0);
-        }
-        else
-        {
-            String[] toArchive = { todoList.get(position).toString(), "false" };
-            intent.putExtra(EXTRA_MESSAGE, toArchive);
-            todoList.remove(position);
-            todoAdapter.notifyDataSetChanged();
-            saveInTodoFile();
-            checkListItem.remove(position);
-            saveInCheckFile();
-            startActivityForResult(intent, 0);
-        }
-    }
-    //http://stackoverflow.com/questions/1124548/how-to-pass-the-values-from-one-activity-to-previous-activity
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode)
-        {
-            case (0):
-            {
-                if (resultCode == Activity.RESULT_OK)
-                {
-                    String[] newText = data.getStringArrayExtra(EXTRA_MESSAGE);
-                    todoList.add(newText[0]);
-                    todoAdapter.notifyDataSetChanged();
-                    checkListItem.add(newText[1]);
-                    saveInCheckFile();
-                    saveInTodoFile();
-                }
-                break;
-            }
-        }
-    }
+				String[] toArchive = { todoList.get(position).toString(),
+				        "true" };
+				intent.putExtra(EXTRA_MESSAGE, toArchive);
+				todoList.remove(position);
+				todoAdapter.notifyDataSetChanged();
+				saveInTodoFile();
+				checkListItem.remove(position);
+				saveInCheckFile();
+				startActivity(intent);
+			}
+			else
+			{
+				String[] toArchive = { todoList.get(position).toString(),
+				        "false" };
+				intent.putExtra(EXTRA_MESSAGE, toArchive);
+				todoList.remove(position);
+				todoAdapter.notifyDataSetChanged();
+				saveInTodoFile();
+				checkListItem.remove(position);
+				saveInCheckFile();
+				startActivity(intent);
+			}
+		}
+		else
+			return;
+	}
 
-    // Adapted from student-picker
-    private void deleteItem(int position)
-    {
-        AlertDialog.Builder deladb = new AlertDialog.Builder(MainActivity.this);
-        deladb.setMessage("Delete " + todoList.get(position).toString() + "?");
-        deladb.setCancelable(true);
-        final int finalPosition = position;
-        deladb.setPositiveButton("Delete", new OnClickListener()
-        {
+	private void saveInArchiveFile()
+	{
+		try
+		{
+			FileOutputStream fos = openFileOutput(
+			        ArchiveActivity.ARCHIVEFILENAME, 0);
+			Gson gson = new Gson();
+			OutputStreamWriter osw = new OutputStreamWriter(fos);
+			gson.toJson(ArchiveActivity.archivedList, osw);
+			osw.flush();
+			fos.close();
+		}
+		catch (FileNotFoundException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                todoList.remove(finalPosition);
-                todoAdapter.notifyDataSetChanged();
-                saveInTodoFile();
-                checkListItem.remove(finalPosition);
-                saveInCheckFile();
-            }
+	private void saveInArchiveCheckFile()
+	{
+		try
+		{
+			FileOutputStream fos = openFileOutput(
+			        ArchiveActivity.CHECKARCHIVEFILENAME, 0);
+			Gson gson = new Gson();
+			OutputStreamWriter osw = new OutputStreamWriter(fos);
+			gson.toJson(ArchiveActivity.checkArchiveItem, osw);
+			osw.flush();
+			fos.close();
+		}
+		catch (FileNotFoundException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-        });
-        deladb.setNegativeButton("Cancel", new OnClickListener()
-        {
+	}
 
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                // Cancels.
-            }
-        });
-        deladb.show();
-    }
+	// Adapted from student-picker
+	private void deleteItem(int position)
+	{
+		AlertDialog.Builder deladb = new AlertDialog.Builder(MainActivity.this);
+		deladb.setMessage("Delete " + todoList.get(position).toString() + "?");
+		deladb.setCancelable(true);
+		final int finalPosition = position;
+		deladb.setPositiveButton("Delete", new OnClickListener()
+		{
 
-    public static ArrayList<String> giveList()
-    {
-        return todoList;
-    }
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				todoList.remove(finalPosition);
+				todoAdapter.notifyDataSetChanged();
+				saveInTodoFile();
+				checkListItem.remove(finalPosition);
+				saveInCheckFile();
+			}
 
-    public void viewArchive(MenuItem menu)
-    {
-        Intent intent = new Intent(MainActivity.this, ArchiveActivity.class);
-        startActivity(intent);
-    }
+		});
+		deladb.setNegativeButton("Cancel", new OnClickListener()
+		{
 
-    public void emailItem(MenuItem menu)
-    {
-        Intent intent = new Intent(MainActivity.this, EmailActivity.class);
-        startActivity(intent);
-    }
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				// Cancels.
+			}
+		});
+		deladb.show();
+	}
 
-    public void viewSummary(MenuItem menu)
-    {
-        Intent intent = new Intent(MainActivity.this, SummaryActivity.class);
-        startActivity(intent);
-    }
+	// taken from lonely twitter
 
-    // taken from lonely twitter
+	private void loadFromTodoFile()
+	{
+		try
+		{
+			FileInputStream fis = openFileInput(TODOFILENAME);
+			BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+			Gson gson = new Gson();
+			// Following was from:
+			// https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
+			Type listType = new TypeToken<ArrayList<String>>()
+			{
+			}.getType();
+			todoList = gson.fromJson(in, listType);
+		}
+		catch (FileNotFoundException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (@SuppressWarnings("hiding") IOException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-    private void loadFromTodoFile()
-    {
-        try
-        {
-            FileInputStream fis = openFileInput(TODOFILENAME);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
-            Gson gson = new Gson();
-            // Following was from:
-            // https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
-            Type listType = new TypeToken<ArrayList<String>>()
-            {
-            }.getType();
-            todoList = gson.fromJson(in, listType);
-            // Type newlistType = new TypeToken<ArrayList<String>>()
-            // {
+	// taken from lonelytwitter
+	private void saveInTodoFile()
+	{
+		try
+		{
+			FileOutputStream fos = openFileOutput(TODOFILENAME, 0);
+			Gson gson = new Gson();
+			OutputStreamWriter osw = new OutputStreamWriter(fos);
+			gson.toJson(todoList, osw);
+			osw.flush();
+			fos.close();
+		}
+		catch (FileNotFoundException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-            // }.getType();
-            // checkListItem = gson.fromJson(in, newlistType);
-        }
-        catch (FileNotFoundException e)
-        { // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        { // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	// taken from lonely twitter
 
-    // taken from lonelytwitter
-    private void saveInTodoFile()
-    {
-        try
-        {
-            FileOutputStream fos = openFileOutput(TODOFILENAME, 0);
-            Gson gson = new Gson();
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            gson.toJson(todoList, osw);
-            // gson.toJson(checkListItem, osw);
-            osw.flush();
-            fos.close();
-        }
-        catch (FileNotFoundException e)
-        { // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        { // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	private void loadFromCheckFile()
+	{
+		try
+		{
+			FileInputStream fis = openFileInput(CHECKFILENAME);
+			BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+			Gson gson = new Gson();
+			// Following was from:
+			// https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
+			Type listType = new TypeToken<ArrayList<String>>()
+			{
 
-    // taken from lonely twitter
+			}.getType();
+			checkListItem = gson.fromJson(in, listType);
+		}
+		catch (FileNotFoundException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (@SuppressWarnings("hiding") IOException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-    private void loadFromCheckFile()
-    {
-        try
-        {
-            FileInputStream fis = openFileInput(CHECKFILENAME);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
-            Gson gson = new Gson();
-            // Following was from:
-            // https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
-            Type listType = new TypeToken<ArrayList<String>>()
-            {
+	// taken from lonelytwitter
+	private void saveInCheckFile()
+	{
+		try
+		{
+			FileOutputStream fos = openFileOutput(CHECKFILENAME, 0);
+			Gson gson = new Gson();
+			OutputStreamWriter osw = new OutputStreamWriter(fos);
+			gson.toJson(checkListItem, osw);
+			osw.flush();
+			fos.close();
+		}
+		catch (FileNotFoundException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-            }.getType();
-            checkListItem = gson.fromJson(in, listType);
-        }
-        catch (FileNotFoundException e)
-        { // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        { // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	public void viewArchive(MenuItem menu)
+	{
+		Intent intent = new Intent(MainActivity.this, ArchiveActivity.class);
+		startActivity(intent);
+	}
 
-    // taken from lonelytwitter
-    private void saveInCheckFile()
-    {
-        try
-        {
-            FileOutputStream fos = openFileOutput(CHECKFILENAME, 0);
-            Gson gson = new Gson();
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            gson.toJson(checkListItem, osw);
-            osw.flush();
-            fos.close();
-        }
-        catch (FileNotFoundException e)
-        { // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        { // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	public void emailItem(MenuItem menu)
+	{
+		Intent intent = new Intent(MainActivity.this, EmailActivity.class);
+		startActivity(intent);
+	}
 
-    public static int giveTotal()
-    {
-        if (todoListView != null)
-            return todoListView.getCount();
-        else
-            return 0;
-    }
+	public void viewSummary(MenuItem menu)
+	{
+		Intent intent = new Intent(MainActivity.this, SummaryActivity.class);
+		startActivity(intent);
+	}
 
-    public static int giveUnchecked()
-    {
-        if (todoListView != null)
-            return (todoListView.getCount() - todoListView
-                    .getCheckedItemCount());
-        else
-            return 0;
-    }
-
-    public static int giveChecked()
-    {
-        if (todoListView != null)
-            return todoListView.getCheckedItemCount();
-        else
-            return 0;
-    }
-
-    /*
-     * public void recieveArchive(String[] unArchive) { Log.v(TAG,
-     * "I am in recieveArchive()"); Log.v(TAG, unArchive[0]); Log.v(TAG,
-     * unArchive[1]); // loadFromCheckFile(); // loadFromTodoFile();
-     * todoList.add(unArchive[0]); todoAdapter.notifyDataSetChanged();
-     * checkListItem.add(unArchive[1]); saveInTodoFile(); saveInCheckFile();
-     * 
-     * }
-     */
 }

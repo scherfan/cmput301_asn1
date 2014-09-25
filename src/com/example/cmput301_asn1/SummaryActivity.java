@@ -60,17 +60,17 @@ public class SummaryActivity extends Activity
 
     private int getTodoUnchecked()
     {
-        return MainActivity.giveUnchecked();
+        return MainActivityHelpers.giveUnchecked();
     }
 
     private int getTodoChecked()
     {
-        return MainActivity.giveChecked();
+        return MainActivityHelpers.giveChecked();
     }
 
     private int getTodoTotal()
     {
-        return MainActivity.giveTotal();
+        return MainActivityHelpers.giveTotal();
     }
 
     @Override
