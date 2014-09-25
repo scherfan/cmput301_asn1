@@ -67,7 +67,7 @@ public class MainActivity extends Activity
 
     protected static ArrayList<String> todoList;
 
-    protected ArrayList<String> checkListItem;
+    protected static ArrayList<String> checkListItem;
 
     protected ArrayAdapter<String> todoAdapter;
 
@@ -87,7 +87,7 @@ public class MainActivity extends Activity
         // also an adapter that has check boxes for the list
         // and a button to add items to the list
 
-        // todoListView.setItemsCanFocus(false);
+        todoListView.setItemsCanFocus(false);
 
         Button add_button = (Button) findViewById(R.id.addButton);
         // initiate a list view for the array list and its check boxes
@@ -101,7 +101,6 @@ public class MainActivity extends Activity
             @Override
             public void onClick(View v)
             {
-                // setResult(RESULT_OK);
                 String todoString = todoText.getText().toString();
                 todoList.add(todoString);
                 todoAdapter.notifyDataSetChanged();
@@ -146,11 +145,11 @@ public class MainActivity extends Activity
                 android.R.layout.simple_list_item_multiple_choice, todoList);
         todoListView.setAdapter(todoAdapter);
 
-        /*
-         * for(int i = 0; i < checkListItem.size();i++) {
-         * if(checkListItem.get(i).equals("true") == true) {
-         * //todoListView.setItemChecked(todoListView.get, true); } }
-         */
+        for (int i = 0; i < checkListItem.size(); i++)
+        {
+            if (checkListItem.get(i).equals("true") == true)
+                todoListView.setItemChecked(i, true);
+        }
 
     }
 
@@ -207,7 +206,7 @@ public class MainActivity extends Activity
 
     private void archiveItem(int position, View v)
     {
-        Intent intent = new Intent(this, ArchiveActivity.class);
+        Intent intent = new Intent(MainActivity.this, ArchiveActivity.class);
 
         CheckedTextView item = (CheckedTextView) v;
         if (item.isChecked())
@@ -219,7 +218,7 @@ public class MainActivity extends Activity
             saveInTodoFile();
             checkListItem.remove(position);
             saveInCheckFile();
-            startActivity(intent);
+            startActivityForResult(intent, 0);
         }
         else
         {
@@ -230,7 +229,29 @@ public class MainActivity extends Activity
             saveInTodoFile();
             checkListItem.remove(position);
             saveInCheckFile();
-            startActivity(intent);
+            startActivityForResult(intent, 0);
+        }
+    }
+    //http://stackoverflow.com/questions/1124548/how-to-pass-the-values-from-one-activity-to-previous-activity
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode)
+        {
+            case (0):
+            {
+                if (resultCode == Activity.RESULT_OK)
+                {
+                    String[] newText = data.getStringArrayExtra(EXTRA_MESSAGE);
+                    todoList.add(newText[0]);
+                    todoAdapter.notifyDataSetChanged();
+                    checkListItem.add(newText[1]);
+                    saveInCheckFile();
+                    saveInTodoFile();
+                }
+                break;
+            }
         }
     }
 
@@ -417,4 +438,14 @@ public class MainActivity extends Activity
         else
             return 0;
     }
+
+    /*
+     * public void recieveArchive(String[] unArchive) { Log.v(TAG,
+     * "I am in recieveArchive()"); Log.v(TAG, unArchive[0]); Log.v(TAG,
+     * unArchive[1]); // loadFromCheckFile(); // loadFromTodoFile();
+     * todoList.add(unArchive[0]); todoAdapter.notifyDataSetChanged();
+     * checkListItem.add(unArchive[1]); saveInTodoFile(); saveInCheckFile();
+     * 
+     * }
+     */
 }

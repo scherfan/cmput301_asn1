@@ -6,48 +6,46 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class ArchiveActivity extends Activity
 {
 
-  //  private static final String FILENAME = "archivefile.sav";
+    // private static final String FILENAME = "archivefile.sav";
 
     protected static ArrayList<String> archivedList;
-    
-   // protected ArrayList<String> checkArchiveItem;
+
+    // protected ArrayList<String> checkArchiveItem;
 
     protected ArrayAdapter<String> adapter;
 
     protected static ListView archiveListView;
 
-    public final static String EXTRA_UNARCHIVEDITEM = "com.example.cmput301_asn1";
+    public final static String EXTRA_MESSAGE = "com.example.cmput301_asn1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-       // loadFromFile();
-       // if (archivedList == null)
-    	archivedList = new ArrayList<String>();
-      //  if (checkArchiveItem == null)
-       //     checkArchiveItem = new ArrayList<String>();
-        
+        // loadFromFile();
+        // if (archivedList == null)
+        archivedList = new ArrayList<String>();
+        // if (checkArchiveItem == null)
+        // checkArchiveItem = new ArrayList<String>();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_archive);
-
 
         archiveListView = (ListView) findViewById(R.id.archive_listview);
         adapter = new ArrayAdapter<String>(this,
@@ -80,92 +78,50 @@ public class ArchiveActivity extends Activity
     }
 
     // taken from lonelyTwitter
-  /*  @Override
-    protected void onStart()
-    {
-        super.onStart();
-       // loadFromFile();
-        if (archivedList == null)
-            archivedList = new ArrayList<String>();
-        //if (checkArchiveItem == null)
-          //  checkArchiveItem = new ArrayList<String>();
-        
-        adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_multiple_choice, archivedList);
-        archiveListView.setAdapter(adapter);
-
-        //for (int i = 0; i < checkArchiveItem.size(); i++)
-       // {
-         //   if (checkArchiveItem.get(i).equals("true") == true)
-           // {
-                //todoListView.setItemChecked(todoListView.get, true);
-           // }
-        //} 
-    } */
+    /*
+     * @Override protected void onStart() { super.onStart(); // loadFromFile();
+     * if (archivedList == null) archivedList = new ArrayList<String>(); //if
+     * (checkArchiveItem == null) // checkArchiveItem = new ArrayList<String>();
+     * 
+     * adapter = new ArrayAdapter<String>(this,
+     * android.R.layout.simple_list_item_multiple_choice, archivedList);
+     * archiveListView.setAdapter(adapter);
+     * 
+     * //for (int i = 0; i < checkArchiveItem.size(); i++) // { // if
+     * (checkArchiveItem.get(i).equals("true") == true) // {
+     * //todoListView.setItemChecked(todoListView.get, true); // } //} }
+     */
 
     // taken from lonely twitter
- /*   private void loadFromFile()
-    {
-        try
-        {
-            FileInputStream fis = openFileInput(FILENAME);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
-            Gson gson = new Gson();
-            // Following was from:
-            // https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/Gson.html
-            Type listType = new TypeToken<ArrayList<String>>()
-            {
-            }.getType();
-            archivedList = gson.fromJson(in, listType);
-            Type newlistType = new TypeToken<ArrayList<String>>()
-            {
-            }.getType();
-            checkArchiveItem = gson.fromJson(in, newlistType);
-        }
-        catch (FileNotFoundException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    // taken from lonelytwitter
-    private void saveInFile()
-    {
-        try
-        {
-            FileOutputStream fos = openFileOutput(FILENAME, 0);
-            Gson gson = new Gson();
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            gson.toJson(archivedList, osw);
-            gson.toJson(checkArchiveItem, osw);
-            osw.flush();
-            fos.close();
-        }
-        catch (FileNotFoundException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    } */
+    /*
+     * private void loadFromFile() { try { FileInputStream fis =
+     * openFileInput(FILENAME); BufferedReader in = new BufferedReader(new
+     * InputStreamReader(fis)); Gson gson = new Gson(); // Following was from:
+     * //
+     * https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google
+     * /gson/Gson.html Type listType = new TypeToken<ArrayList<String>>() {
+     * }.getType(); archivedList = gson.fromJson(in, listType); Type newlistType
+     * = new TypeToken<ArrayList<String>>() { }.getType(); checkArchiveItem =
+     * gson.fromJson(in, newlistType); } catch (FileNotFoundException e) { //
+     * TODO Auto-generated catch block e.printStackTrace(); } catch (IOException
+     * e) { // TODO Auto-generated catch block e.printStackTrace(); } }
+     * 
+     * // taken from lonelytwitter private void saveInFile() { try {
+     * FileOutputStream fos = openFileOutput(FILENAME, 0); Gson gson = new
+     * Gson(); OutputStreamWriter osw = new OutputStreamWriter(fos);
+     * gson.toJson(archivedList, osw); gson.toJson(checkArchiveItem, osw);
+     * osw.flush(); fos.close(); } catch (FileNotFoundException e) { // TODO
+     * Auto-generated catch block e.printStackTrace(); } catch (IOException e) {
+     * // TODO Auto-generated catch block e.printStackTrace(); } }
+     */
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-            ContextMenuInfo menuInfo)
+    public void onCreateContextMenu(ContextMenu Menu, View view,
+            ContextMenuInfo MenuInfo)
     {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.archive_context, menu);
+        super.onCreateContextMenu(Menu, view, MenuInfo);
+        MenuInflater Inflater = getMenuInflater();
+        Inflater.inflate(R.menu.archive_context, Menu);
     }
 
     @Override
@@ -183,15 +139,6 @@ public class ArchiveActivity extends Activity
             case R.id.unarchive_option:
                 unarchiveItem(position, v);
                 return true;
-                // case R.id.email_option:
-                // emailItem();
-                // return true;
-                // case R.id.action_settings:
-                // accessSettings();
-                // return true;
-                // case R.id.summary_option:
-                // accessSummary();
-                // return true;
             default:
                 return super.onContextItemSelected(item);
         }
@@ -199,29 +146,29 @@ public class ArchiveActivity extends Activity
 
     private void unarchiveItem(int position, View v)
     {
-        Intent backToMainIntent = new Intent(this, MainActivity.class);
+        Intent backToMainIntent = new Intent();
 
         CheckedTextView item = (CheckedTextView) v;
         if (item.isChecked())
         {
             String[] unArchive = { archivedList.get(position).toString(),
                     "true" };
-            backToMainIntent.putExtra(EXTRA_UNARCHIVEDITEM, unArchive);
+            backToMainIntent.putExtra(EXTRA_MESSAGE, unArchive);
             setResult(Activity.RESULT_OK, backToMainIntent);
             archivedList.remove(position);
             adapter.notifyDataSetChanged();
-           // saveInFile();
+            // saveInFile();
             finish();
         }
         else
         {
             String[] unArchive = { archivedList.get(position).toString(),
                     "false" };
-            backToMainIntent.putExtra(EXTRA_UNARCHIVEDITEM, unArchive);
+            backToMainIntent.putExtra(EXTRA_MESSAGE, unArchive);
             setResult(Activity.RESULT_OK, backToMainIntent);
             archivedList.remove(position);
             adapter.notifyDataSetChanged();
-         //   saveInFile();
+            // saveInFile();
             finish();
         }
     }
@@ -243,7 +190,7 @@ public class ArchiveActivity extends Activity
             {
                 archivedList.remove(finalPosition);
                 adapter.notifyDataSetChanged();
-               // saveInFile();
+                // saveInFile();
             }
 
         });
@@ -280,17 +227,19 @@ public class ArchiveActivity extends Activity
         }
         return super.onOptionsItemSelected(item);
     }
-    
-	public void emailItemFromArchive(MenuItem menu)
-	{
-		Intent intent = new Intent(ArchiveActivity.this, EmailActivity.class);
-		startActivity(intent);
-	}
-	public void viewSummaryFromArchive(MenuItem menu)
-	{
-	    Intent intent = new Intent(ArchiveActivity.this, SummaryActivity.class);
-	    startActivity(intent);
-	}
+
+    public void emailItemFromArchive(MenuItem menu)
+    {
+        Intent intent = new Intent(ArchiveActivity.this, EmailActivity.class);
+        startActivity(intent);
+    }
+
+    public void viewSummaryFromArchive(MenuItem menu)
+    {
+        Intent intent = new Intent(ArchiveActivity.this, SummaryActivity.class);
+        startActivity(intent);
+    }
+
     public static ArrayList<String> giveList()
     {
         return archivedList;
@@ -298,15 +247,16 @@ public class ArchiveActivity extends Activity
 
     public static int giveUnchecked()
     {
-        if(archiveListView != null)
-            return (archiveListView.getCount() - archiveListView.getCheckedItemCount());
+        if (archiveListView != null)
+            return (archiveListView.getCount() - archiveListView
+                    .getCheckedItemCount());
         else
             return 0;
     }
 
     public static int giveChecked()
     {
-        if(archiveListView != null)
+        if (archiveListView != null)
             return archiveListView.getCheckedItemCount();
         else
             return 0;
@@ -314,7 +264,7 @@ public class ArchiveActivity extends Activity
 
     public static int giveTotal()
     {
-        if(archiveListView != null)
+        if (archiveListView != null)
             return archiveListView.getCount();
         else
             return 0;
