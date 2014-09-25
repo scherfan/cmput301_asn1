@@ -75,7 +75,7 @@ public class ArchiveActivity extends Activity
                 android.R.layout.simple_list_item_multiple_choice, archivedList);
         archiveListView.setAdapter(adapter);
 
-        Intent intent = getIntent();
+       /* Intent intent = getIntent();
         int position;
         if (intent.getStringArrayExtra(MainActivity.EXTRA_MESSAGE) != null)
         {
@@ -107,7 +107,7 @@ public class ArchiveActivity extends Activity
                 if (checkArchiveItem.get(i).equals("true") == true)
                     archiveListView.setItemChecked(i, true);
             }
-        }
+        } */
         
         archiveListView.setOnItemClickListener(new OnItemClickListener()
         {
@@ -172,6 +172,33 @@ public class ArchiveActivity extends Activity
         {
             if (checkArchiveItem.get(i).equals("true") == true)
                 archiveListView.setItemChecked(i, true);
+        }
+        
+        Intent intent = getIntent();
+        int position;
+        if (intent.getStringArrayExtra(MainActivity.EXTRA_MESSAGE) != null)
+        {
+            String[] toArchive = intent
+                    .getStringArrayExtra(MainActivity.EXTRA_MESSAGE);
+            if (toArchive[1].equals("true") == true)
+            {
+                archivedList.add(toArchive[0]);
+                adapter.notifyDataSetChanged();
+                checkArchiveItem.add(toArchive[1]);
+                position = adapter.getPosition(toArchive[0]);
+                archiveListView.setItemChecked(position, true);
+                saveInArchiveFile();
+                saveInCheckFile();
+            }
+            else
+            {
+                archivedList.add(toArchive[0]);
+                adapter.notifyDataSetChanged();
+                checkArchiveItem.add(toArchive[1]);
+                saveInArchiveFile();
+                saveInCheckFile();
+
+            }
         }
     }
 
