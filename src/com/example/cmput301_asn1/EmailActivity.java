@@ -18,13 +18,13 @@ import android.widget.Toast;
 
 public class EmailActivity extends Activity
 {
-    protected ArrayList<String> newList;
-    protected ArrayList<String> newList2;
+    protected ArrayList<String> eTodoList;
+    protected ArrayList<String> eArchiveList;
     protected ArrayList<String> finalList;
 
 
-    protected ArrayAdapter<String> adapter1;
-    protected ArrayAdapter<String> adapter2;
+    protected ArrayAdapter<String> todoAdapter;
+    protected ArrayAdapter<String> archiveAdapter;
 
     protected ListView emailTodoListView;
     protected ListView emailArchiveListView;
@@ -38,18 +38,22 @@ public class EmailActivity extends Activity
         emailTodoListView = (ListView) findViewById(R.id.emailtodolist);
        emailArchiveListView = (ListView) findViewById(R.id.emailarchivelist);
         
-        newList = new ArrayList<String>();
-        newList2 = new ArrayList<String>();
-        newList = MainActivity.giveList();
-        newList2 = ArchiveActivity.giveList();
+        eTodoList = new ArrayList<String>();
+        eArchiveList = new ArrayList<String>();
+        
+        if (MainActivity.giveList() != null)
+            eTodoList = MainActivity.giveList();
+        if (ArchiveActivity.giveList() != null)
+            eArchiveList = ArchiveActivity.giveList();
+        
         finalList = new ArrayList<String>();
         
-        adapter1 = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_multiple_choice, newList);
-        adapter2 = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_multiple_choice, newList2);
-        emailTodoListView.setAdapter(adapter1);
-        emailArchiveListView.setAdapter(adapter2);
+        todoAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_multiple_choice, eTodoList);
+        archiveAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_multiple_choice, eArchiveList);
+        emailTodoListView.setAdapter(todoAdapter);
+        emailArchiveListView.setAdapter(archiveAdapter);
     }
 
     @Override
@@ -74,25 +78,14 @@ public class EmailActivity extends Activity
     //http://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-android-application
     public void emailItems(View view)
     {
-       /* Intent intent = new Intent(Intent.ACTION_SEND);
-        PackageManager packageManager = getPackageManager();
-        List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, 0);
-        boolean isIntentSafe = activities.size() > 0;
-        if(isIntentSafe)
-        {
-            getChecked();
-            intent.putExtra(Intent.EXTRA_TEXT, finalList);
-            startActivity(Intent.createChooser(intent, "Email"));
-            
-        }*/
-        Intent i = new Intent(Intent.ACTION_SEND);
-        i.setType("message/rfc822");
-        i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"recipient@example.com"});
-        i.putExtra(Intent.EXTRA_SUBJECT, "subject of email");
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("message/rfc822");
+        intent.putExtra(Intent.EXTRA_EMAIL  , new String[]{"recipient@example.com"});
+        intent.putExtra(Intent.EXTRA_SUBJECT, "subject of email");
         getChecked();
-        i.putExtra(Intent.EXTRA_TEXT, finalList.toString());
+        intent.putExtra(Intent.EXTRA_TEXT, finalList.toString());
         try {
-            startActivity(Intent.createChooser(i, "Send mail..."));
+            startActivity(Intent.createChooser(intent, "Send mail..."));
         } catch (android.content.ActivityNotFoundException ex) {
             Toast.makeText(this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
         }

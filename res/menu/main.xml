@@ -1,5 +1,4 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/action_settings"
@@ -12,9 +11,11 @@
         android:onClick="emailItem"/>
     <item
         android:id="@+id/summary_option"
-        android:title="@string/summary_menu_title"/>
+        android:title="@string/summary_menu_title"
+        android:onClick="viewSummary"/>
     <item
         android:id="@+id/view_archive_option"
-        android:title="@string/view_archive_menu_title"/>
+        android:title="@string/view_archive_menu_title"
+        android:onClick="viewArchive"/>
 
 </menu>

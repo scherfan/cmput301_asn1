@@ -162,7 +162,7 @@ public class ArchiveActivity extends Activity
     {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.archive, menu);
+        inflater.inflate(R.menu.archive_context, menu);
     }
 
     @Override
@@ -260,7 +260,7 @@ public class ArchiveActivity extends Activity
     public boolean onCreateOptionsMenu(Menu menu)
     {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.archive, menu);
         return true;
     }
 
@@ -278,7 +278,7 @@ public class ArchiveActivity extends Activity
         return super.onOptionsItemSelected(item);
     }
     
-	public void emailItem(MenuItem menu)
+	public void emailItemFromArchive(MenuItem menu)
 	{
 		Intent intent = new Intent(ArchiveActivity.this, EmailActivity.class);
 		startActivity(intent);
