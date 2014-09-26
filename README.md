@@ -33,7 +33,7 @@ The email screen will allow you to select all or some tasks available in the mai
 list and sending those tasks to an email client on the device for emailing. Clicking the tasks and then
 clicking the email button at the bottom of the screen will do this. As long as there is an email account
 on an email client on the device then the app will be able to find it(this was tested on the Eclispe Android
-emulator and the default email client on the emulator).
+emulator and the default email client on the emulator with it connecting to my email address).
 
 Style and code were adapted from various sources and their URLs have been referenced. Style involving the Android
 API and general Android development style (e.g., using intents, etc.) was adapted from the Android Developer tutorials:
