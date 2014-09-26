@@ -1,10 +1,15 @@
+
 package com.example.cmput301_asn1;
 
 import java.util.ArrayList;
 
+/*
+ * Helper methods for the archive activity. 
+ */
 
 public class ArchiveActivityHelpers extends ArchiveActivity
 {
+
 	public static ArrayList<String> giveList()
 	{
 		return archivedList;

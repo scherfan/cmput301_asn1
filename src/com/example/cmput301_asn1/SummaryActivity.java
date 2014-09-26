@@ -31,6 +31,9 @@ public class SummaryActivity extends Activity
         archiveUncheckedView = (TextView) findViewById(R.id.archiveUnchecked);
     }
     
+    /*
+     *	Updates the stats every time the activity resumes. 
+     */
     @Override
     public void onResume()
     {
@@ -91,6 +94,8 @@ public class SummaryActivity extends Activity
         if (id == R.id.action_settings) { return true; }
         return super.onOptionsItemSelected(item);
     }
+    
+    // Change activity methods
     
     public void viewArchive(MenuItem menu)
     {

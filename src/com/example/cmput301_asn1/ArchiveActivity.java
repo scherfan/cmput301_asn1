@@ -113,10 +113,9 @@ public class ArchiveActivity extends Activity
 		archiveListView = (ListView) findViewById(R.id.archive_listview);
 		archiveListView.setItemsCanFocus(false);
 		registerForContextMenu(archiveListView);
-		
+
 		/*
-		 * Listens for user clicking an item to check it and saves it
-		 * to file.
+		 * Listens for user clicking an item to check it and saves it to file.
 		 */
 		archiveListView.setOnItemClickListener(new OnItemClickListener()
 		{
@@ -137,11 +136,10 @@ public class ArchiveActivity extends Activity
 	}
 
 	/*
-	 * Handles saving the array list that tracks
-	 * which items are checked.
-	 * Code borrowed from joshua2ua and our work in the lab
-	 * https://github.com/scherfan/lonelyTwitter/tree/f14iot
-	 * (this applies to all loading from and saving to files)
+	 * Handles saving the array list that tracks which items are checked. Code
+	 * borrowed from joshua2ua and our work in the lab
+	 * https://github.com/scherfan/lonelyTwitter/tree/f14iot (this applies to
+	 * all loading from and saving to files)
 	 */
 	private void saveInCheckFile()
 	{
@@ -165,7 +163,7 @@ public class ArchiveActivity extends Activity
 			e.printStackTrace();
 		}
 	}
-	
+
 	// https://github.com/scherfan/lonelyTwitter/tree/f14iot
 	@Override
 	protected void onResume()
@@ -189,7 +187,6 @@ public class ArchiveActivity extends Activity
 		}
 	}
 
-	
 	// https://github.com/scherfan/lonelyTwitter/tree/f14iot
 	private void loadFromCheckFile()
 	{
@@ -342,6 +339,14 @@ public class ArchiveActivity extends Activity
 		}
 	}
 
+	/*
+	 * When the user clicks the unarchvie context menu button this method checks
+	 * it that archived item was checked, saving that status (unArchvie[1]) in
+	 * the respective todo file and updates the todo status list. It also
+	 * directly saves and updates todo lists new unarchived (unArchive[0]) item
+	 * into the respective lists and files and them removes the item from the
+	 * archive list and save file and finishes the activity.
+	 */
 	private void unarchiveItem(int position, View v)
 	{
 		CheckedTextView item = (CheckedTextView) v;
@@ -379,8 +384,12 @@ public class ArchiveActivity extends Activity
 		}
 	}
 
-	// Adapted from student-picker
-	// https://github.com/abramhindle/student-picker
+	/*
+	 * Adapted from student-picker https://github.com/abramhindle/student-picker
+	 * When the user clicks the delete button a dialog will give options to
+	 * delete or cancel. When deleted the method removes the item from the list
+	 * and updates the check status and save files.
+	 */
 	private void deleteItem(int position)
 	{
 		AlertDialog.Builder deladb = new AlertDialog.Builder(
@@ -437,6 +446,8 @@ public class ArchiveActivity extends Activity
 		return super.onOptionsItemSelected(item);
 	}
 
+	// Change activity methods
+	
 	public void emailItemFromArchive(MenuItem menu)
 	{
 		Intent intent = new Intent(ArchiveActivity.this, EmailActivity.class);

@@ -34,7 +34,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -56,7 +55,7 @@ import com.google.gson.reflect.TypeToken;
 public class MainActivity extends Activity
 {
 
-	private static final String TAG = "DEBUG";
+	// private static final String TAG = "DEBUG";
 
 	// save file for the list of todos
 	protected static final String TODOFILENAME = "todofile.sav";
@@ -136,10 +135,8 @@ public class MainActivity extends Activity
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Activity#onStart() Loads items and initializes adapter,
+	/* 
+	 * Loads items and initializes adapter,
 	 * also checks items if they were checked earlier. Idea and style borrowed
 	 * from the work done in the lab. https://github.com/joshua2ua/lonelyTwitter
 	 */
@@ -225,14 +222,24 @@ public class MainActivity extends Activity
 		return super.onOptionsItemSelected(item);
 	}
 
+	/*
+	 * This method sends items from the todo list to the archive list when
+	 * selected by the user and deletes it from the to do list. It creates an
+	 * intent so that the user goes to the archive screen after clicking the
+	 * menu button. In one case does the method send the item over using
+	 * putExtra and the intent, otherwise it just removes the item from this
+	 * list and places it directly into the archive lists.
+	 */
 	private void archiveItem(int position, View v)
 	{
 		Intent intent = new Intent(MainActivity.this, ArchiveActivity.class);
 
 		CheckedTextView item = (CheckedTextView) v;
+
 		if (ArchiveActivity.archivedList != null
 		        && ArchiveActivity.checkArchiveItem != null)
 		{
+
 			if (item.isChecked())
 			{
 
@@ -270,7 +277,7 @@ public class MainActivity extends Activity
 		else if (ArchiveActivity.archivedList == null
 		        && ArchiveActivity.checkArchiveItem == null)
 		{
-			Log.v(TAG, "AM i gettting here?");
+			// Log.v(TAG, "AM i getting here?");
 			if (item.isChecked())
 			{
 
@@ -301,52 +308,14 @@ public class MainActivity extends Activity
 			return;
 	}
 
-	private void saveInArchiveFile()
-	{
-		try
-		{
-			FileOutputStream fos = openFileOutput(
-			        ArchiveActivity.ARCHIVEFILENAME, 0);
-			Gson gson = new Gson();
-			OutputStreamWriter osw = new OutputStreamWriter(fos);
-			gson.toJson(ArchiveActivity.archivedList, osw);
-			osw.flush();
-			fos.close();
-		}
-		catch (FileNotFoundException e)
-		{ // TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (IOException e)
-		{ // TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private void saveInArchiveCheckFile()
-	{
-		try
-		{
-			FileOutputStream fos = openFileOutput(
-			        ArchiveActivity.CHECKARCHIVEFILENAME, 0);
-			Gson gson = new Gson();
-			OutputStreamWriter osw = new OutputStreamWriter(fos);
-			gson.toJson(ArchiveActivity.checkArchiveItem, osw);
-			osw.flush();
-			fos.close();
-		}
-		catch (FileNotFoundException e)
-		{ // TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (IOException e)
-		{ // TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	// Adapted from student-picker
+	/*
+	 * This method was adapted from
+	 * https://github.com/abramhindle/student-picker It handles the deleting of
+	 * an item from the todo list when clicking on the correct context button.
+	 * It gives an alret dialog with the option to delete or cancel. Deleteing
+	 * removes the item and its corresponding check status from their respective
+	 * lists and saves to respective files.
+	 */
 	private void deleteItem(int position)
 	{
 		AlertDialog.Builder deladb = new AlertDialog.Builder(MainActivity.this);
@@ -379,8 +348,64 @@ public class MainActivity extends Activity
 		deladb.show();
 	}
 
-	// taken from lonely twitter
+	/*
+	 * All methods that save to or load from a file and the creation of those
+	 * files were taken from:
+	 * https://github.com/scherfan/lonelyTwitter/tree/f14iot This is a fork
+	 * from: https://github.com/joshua2ua/lonelyTwitter where the owner wrote
+	 * this code for us to use in the lab.
+	 */
+	// Saves directly to the file for archived items.
+	private void saveInArchiveFile()
+	{
+		try
+		{
+			FileOutputStream fos = openFileOutput(
+			        ArchiveActivity.ARCHIVEFILENAME, 0);
+			Gson gson = new Gson();
+			OutputStreamWriter osw = new OutputStreamWriter(fos);
+			gson.toJson(ArchiveActivity.archivedList, osw);
+			osw.flush();
+			fos.close();
+		}
+		catch (FileNotFoundException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
+	// Adapted from lonelytwitter
+	// Saves directly to the file used to track
+	// which items are checked in the archive.
+	private void saveInArchiveCheckFile()
+	{
+		try
+		{
+			FileOutputStream fos = openFileOutput(
+			        ArchiveActivity.CHECKARCHIVEFILENAME, 0);
+			Gson gson = new Gson();
+			OutputStreamWriter osw = new OutputStreamWriter(fos);
+			gson.toJson(ArchiveActivity.checkArchiveItem, osw);
+			osw.flush();
+			fos.close();
+		}
+		catch (FileNotFoundException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{ // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	// Adapted from lonely twitter
+	// Loads the contents of the todo list
 	private void loadFromTodoFile()
 	{
 		try
@@ -405,7 +430,8 @@ public class MainActivity extends Activity
 		}
 	}
 
-	// taken from lonelytwitter
+	// adapted from lonelytwitter
+	// Saves the contents of the todo list
 	private void saveInTodoFile()
 	{
 		try
@@ -427,8 +453,8 @@ public class MainActivity extends Activity
 		}
 	}
 
-	// taken from lonely twitter
-
+	// adapted from lonely twitter
+	// Loads the list that tracks todos check status
 	private void loadFromCheckFile()
 	{
 		try
@@ -454,7 +480,8 @@ public class MainActivity extends Activity
 		}
 	}
 
-	// taken from lonelytwitter
+	// adapted from lonelytwitter
+	// Saves the contents of the list that tracks check status for todo
 	private void saveInCheckFile()
 	{
 		try
@@ -476,18 +503,21 @@ public class MainActivity extends Activity
 		}
 	}
 
+	// Handles starting the archive activity
 	public void viewArchive(MenuItem menu)
 	{
 		Intent intent = new Intent(MainActivity.this, ArchiveActivity.class);
 		startActivity(intent);
 	}
 
+	// Handles starting the email activity
 	public void emailItem(MenuItem menu)
 	{
 		Intent intent = new Intent(MainActivity.this, EmailActivity.class);
 		startActivity(intent);
 	}
 
+	// Handles starting the summary activity
 	public void viewSummary(MenuItem menu)
 	{
 		Intent intent = new Intent(MainActivity.this, SummaryActivity.class);

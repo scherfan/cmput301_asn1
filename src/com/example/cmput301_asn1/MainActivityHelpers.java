@@ -2,6 +2,9 @@ package com.example.cmput301_asn1;
 
 import java.util.ArrayList;
 
+/*
+ * Helper methods for the main activity
+ */
 
 public class MainActivityHelpers extends MainActivity
 {
