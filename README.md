@@ -1,10 +1,12 @@
 cherfan-To Do List
 ============
+```
 Name: Steven Cherfan
 CCID: cherfan
 App name: cherfan-To Do List
 Workspace Name: cmput301_asn1
-============
+```
+
 A simple todo list app on Android.
 
 This app is capable of adding to do tasks and checking them off when the task is completed; it is
