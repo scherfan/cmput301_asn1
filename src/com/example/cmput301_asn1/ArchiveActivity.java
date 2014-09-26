@@ -34,7 +34,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -53,7 +52,6 @@ import com.google.gson.reflect.TypeToken;
 
 public class ArchiveActivity extends Activity
 {
-	 private static final String TAG = "DEBUG";
 
 	// File for storing the archived items
 	protected static final String ARCHIVEFILENAME = "archivefile.sav";
@@ -71,26 +69,34 @@ public class ArchiveActivity extends Activity
 
 	protected static ListView archiveListView;
 
-	//public final static String EXTRA_MESSAGE = "com.example.cmput301_asn1";
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_archive);
+		archiveListView = (ListView) findViewById(R.id.archive_listview);
+		archiveListView.setItemsCanFocus(false);
+		registerForContextMenu(archiveListView);
 
 		/*
 		 * If an item is being passed to here to be archived from main activity
-		 * where the app is being run after being destroyed this block handles
-		 * the storing of the item. This avoids the null pointer error from
-		 * trying to access a null array list from main activity.
+		 * where the app is being run for the first time or after calling
+		 * onDestroy() this block handles the transfering and storing of the
+		 * item here. This avoids the null pointer error from trying to access
+		 * an array list before it is initialized from main activity.
 		 */
 		if (archivedList == null || checkArchiveItem == null)
 		{
-			Log.v(TAG, "getting in to the null if");
 			// Initializes array lists if they have not been initialized yet
 			archivedList = new ArrayList<String>();
 			checkArchiveItem = new ArrayList<String>();
+
+			// Initializes the adapter
+			adapter = new ArrayAdapter<String>(this,
+			        android.R.layout.simple_list_item_multiple_choice,
+			        archivedList);
+			archiveListView.setAdapter(adapter);
+
 			Intent intent = getIntent();
 			int position;
 			if (intent.getStringArrayExtra(MainActivity.EXTRA_MESSAGE) != null)
@@ -101,10 +107,10 @@ public class ArchiveActivity extends Activity
 				// archived.
 				String[] toArchive = intent
 				        .getStringArrayExtra(MainActivity.EXTRA_MESSAGE);
-				Log.v(TAG, toArchive.toString());
+
 				if (toArchive[1].equals("true") == true)
 				{
-					Log.v(TAG, "problem here?");
+
 					/*
 					 * If it is checked in main then store the string and update
 					 * listview. Update the array list that tracks checked items
@@ -131,10 +137,6 @@ public class ArchiveActivity extends Activity
 			}
 		}
 
-		archiveListView = (ListView) findViewById(R.id.archive_listview);
-		archiveListView.setItemsCanFocus(false);
-		registerForContextMenu(archiveListView);
-
 		/*
 		 * Listens for user clicking an item to check it and saves it to file.
 		 */
@@ -157,10 +159,10 @@ public class ArchiveActivity extends Activity
 	}
 
 	/*
-	 * Handles saving the array list that tracks which items are checked. Code
-	 * borrowed from joshua2ua and our work in the lab
-	 * https://github.com/scherfan/lonelyTwitter/tree/f14iot (this applies to
-	 * all loading from and saving to files)
+	 * Handles saving the array list that tracks which items are checked. All
+	 * methods that handle saving to and loading from a file was borrowed from
+	 * joshua2ua and our work in the lab
+	 * https://github.com/scherfan/lonelyTwitter/tree/f14iot
 	 */
 	private void saveInCheckFile()
 	{
@@ -406,10 +408,11 @@ public class ArchiveActivity extends Activity
 	}
 
 	/*
-	 * Adapted from student-picker https://github.com/abramhindle/student-picker
-	 * When the user clicks the delete button a dialog will give options to
-	 * delete or cancel. When deleted the method removes the item from the list
-	 * and updates the check status and save files.
+	 * Adapted from abramhindle's student-picker
+	 * https://github.com/abramhindle/student-picker When the user clicks the
+	 * delete button a dialog will give options to delete or cancel. When
+	 * deleted the method removes the item from the list and updates the check
+	 * status and save files.
 	 */
 	private void deleteItem(int position)
 	{

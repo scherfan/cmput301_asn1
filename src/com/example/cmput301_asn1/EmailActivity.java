@@ -99,9 +99,10 @@ public class EmailActivity extends Activity
 	}
 
 	/*
-	 * Style adapted from:
+	 * Adapted from: fiXedd on StackOverflow
 	 * http://stackoverflow.com/questions/2197741/how-can-i-send-emails-from-my-
-	 * android-application Using an intent this method sends the list of todos
+	 * android-application 
+	 * Using an intent this method sends the list of todos
 	 * that the user wants to email in the form of a string. It looks for
 	 * suitable apps to send the information to.
 	 */

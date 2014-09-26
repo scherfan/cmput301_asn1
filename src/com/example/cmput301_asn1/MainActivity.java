@@ -34,7 +34,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -55,8 +54,6 @@ import com.google.gson.reflect.TypeToken;
 
 public class MainActivity extends Activity
 {
-
-	 private static final String TAG = "DEBUG";
 
 	// save file for the list of todos
 	protected static final String TODOFILENAME = "todofile.sav";
@@ -138,8 +135,8 @@ public class MainActivity extends Activity
 
 	/*
 	 * Loads items and initializes adapter, also checks items if they were
-	 * checked earlier. Idea and style borrowed from the work done in the lab.
-	 * https://github.com/joshua2ua/lonelyTwitter
+	 * checked earlier. Idea and style borrowed from joshua2ua and the work done
+	 * in the lab. https://github.com/joshua2ua/lonelyTwitter
 	 */
 	@Override
 	protected void onResume()
@@ -175,11 +172,8 @@ public class MainActivity extends Activity
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Activity#onContextItemSelected(android.view.MenuItem) If
-	 * one of the context items gets clicked this method delegates to the proper
-	 * method.
+	 * If one of the context items gets clicked this method delegates to the
+	 * proper method.
 	 */
 	@Override
 	public boolean onContextItemSelected(MenuItem item)
@@ -240,8 +234,6 @@ public class MainActivity extends Activity
 		if (ArchiveActivity.archivedList != null
 		        && ArchiveActivity.checkArchiveItem != null)
 		{
-			Log.v(TAG, "not null!");
-
 			if (item.isChecked())
 			{
 
@@ -279,7 +271,6 @@ public class MainActivity extends Activity
 		else if (ArchiveActivity.archivedList == null
 		        && ArchiveActivity.checkArchiveItem == null)
 		{
-			 Log.v(TAG, "AM i getting here?");
 			if (item.isChecked())
 			{
 
@@ -311,10 +302,10 @@ public class MainActivity extends Activity
 	}
 
 	/*
-	 * This method was adapted from
+	 * This method was adapted from abramhindle's student-picker:
 	 * https://github.com/abramhindle/student-picker It handles the deleting of
 	 * an item from the todo list when clicking on the correct context button.
-	 * It gives an alret dialog with the option to delete or cancel. Deleteing
+	 * It gives an alert dialog with the option to delete or cancel. Deleting
 	 * removes the item and its corresponding check status from their respective
 	 * lists and saves to respective files.
 	 */
@@ -353,9 +344,9 @@ public class MainActivity extends Activity
 	/*
 	 * All methods that save to or load from a file and the creation of those
 	 * files were taken from:
-	 * https://github.com/scherfan/lonelyTwitter/tree/f14iot This is a fork
-	 * from: https://github.com/joshua2ua/lonelyTwitter where the owner wrote
-	 * this code for us to use in the lab.
+	 * https://github.com/scherfan/lonelyTwitter/tree/f14iot This is a fork from
+	 * joshua2ua's lonelytwitter: https://github.com/joshua2ua/lonelyTwitter
+	 * where the owner wrote this code as an example in the lab.
 	 */
 	// Saves directly to the file for archived items.
 	private void saveInArchiveFile()
@@ -406,7 +397,7 @@ public class MainActivity extends Activity
 
 	}
 
-	// Adapted from lonely twitter
+	// Adapted from lonelytwitter
 	// Loads the contents of the todo list
 	private void loadFromTodoFile()
 	{
@@ -455,7 +446,7 @@ public class MainActivity extends Activity
 		}
 	}
 
-	// adapted from lonely twitter
+	// adapted from lonelytwitter
 	// Loads the list that tracks todos check status
 	private void loadFromCheckFile()
 	{
