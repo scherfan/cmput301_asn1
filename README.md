@@ -1,10 +1,11 @@
 cherfan-To Do List
 ============
-
+Name: Steven Cherfan
+CCID: cherfan
+App name: cherfan-To Do List
+Workspace Name: cmput301_asn1
+============
 A simple todo list app on Android.
-
-My name is Steven Cherfan, my CCID is cherfan, the name of the app in the launcher is cherfan-To Do List
-and the project name (or at least the title of the folder and this repo) is cmput301_asn1
 
 This app is capable of adding to do tasks and checking them off when the task is completed; it is
 also capable of archiving tasks for later reference. From both activities you can also delete tasks
