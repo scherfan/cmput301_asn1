@@ -1,3 +1,20 @@
+/**
+ * cherfan-To Do List is a simple to do listing and archiving app on Android.
+ * Copyright (C) 2014 Steven Cherfan - cherfan@ualberta.ca
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 package com.example.cmput301_asn1;
 
@@ -17,15 +34,16 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
@@ -35,6 +53,7 @@ import com.google.gson.reflect.TypeToken;
 
 public class ArchiveActivity extends Activity
 {
+	 private static final String TAG = "DEBUG";
 
 	// File for storing the archived items
 	protected static final String ARCHIVEFILENAME = "archivefile.sav";
@@ -52,18 +71,13 @@ public class ArchiveActivity extends Activity
 
 	protected static ListView archiveListView;
 
-	public final static String EXTRA_MESSAGE = "com.example.cmput301_asn1";
+	//public final static String EXTRA_MESSAGE = "com.example.cmput301_asn1";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_archive);
-		// Initializes array lists if they have not been initialized yet
-		if (archivedList == null)
-			archivedList = new ArrayList<String>();
-		if (checkArchiveItem == null)
-			checkArchiveItem = new ArrayList<String>();
 
 		/*
 		 * If an item is being passed to here to be archived from main activity
@@ -73,17 +87,24 @@ public class ArchiveActivity extends Activity
 		 */
 		if (archivedList == null || checkArchiveItem == null)
 		{
+			Log.v(TAG, "getting in to the null if");
+			// Initializes array lists if they have not been initialized yet
+			archivedList = new ArrayList<String>();
+			checkArchiveItem = new ArrayList<String>();
 			Intent intent = getIntent();
 			int position;
 			if (intent.getStringArrayExtra(MainActivity.EXTRA_MESSAGE) != null)
 			{
+
 				// toArchive[0] is the item to be archived.
 				// toArchvie[1] is whether or not it was checked before being
 				// archived.
 				String[] toArchive = intent
 				        .getStringArrayExtra(MainActivity.EXTRA_MESSAGE);
+				Log.v(TAG, toArchive.toString());
 				if (toArchive[1].equals("true") == true)
 				{
+					Log.v(TAG, "problem here?");
 					/*
 					 * If it is checked in main then store the string and update
 					 * listview. Update the array list that tracks checked items

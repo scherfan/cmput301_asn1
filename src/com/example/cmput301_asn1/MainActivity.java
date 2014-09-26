@@ -34,6 +34,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -55,7 +56,7 @@ import com.google.gson.reflect.TypeToken;
 public class MainActivity extends Activity
 {
 
-	// private static final String TAG = "DEBUG";
+	 private static final String TAG = "DEBUG";
 
 	// save file for the list of todos
 	protected static final String TODOFILENAME = "todofile.sav";
@@ -239,6 +240,7 @@ public class MainActivity extends Activity
 		if (ArchiveActivity.archivedList != null
 		        && ArchiveActivity.checkArchiveItem != null)
 		{
+			Log.v(TAG, "not null!");
 
 			if (item.isChecked())
 			{
@@ -277,7 +279,7 @@ public class MainActivity extends Activity
 		else if (ArchiveActivity.archivedList == null
 		        && ArchiveActivity.checkArchiveItem == null)
 		{
-			// Log.v(TAG, "AM i getting here?");
+			 Log.v(TAG, "AM i getting here?");
 			if (item.isChecked())
 			{
 
