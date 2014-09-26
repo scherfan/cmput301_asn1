@@ -5,7 +5,7 @@ Name: Steven Cherfan
 CCID: cherfan
 App Name: cherfan-To Do List
 Workspace Name: cmput301_asn1
-Executable: cmput301_an1.apk
+Executable: bin/cmput301_asn1.apk
 ```
 
 A simple todo list app on Android.
