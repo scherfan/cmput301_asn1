@@ -146,4 +146,10 @@ public class EmailActivity extends Activity
 		Intent intent = new Intent(EmailActivity.this, SummaryActivity.class);
 		startActivity(intent);
 	}
+
+	public void settings(MenuItem menu)
+	{
+		Intent intent = new Intent(EmailActivity.this, SettingsActivity.class);
+		startActivity(intent);
+	}
 }

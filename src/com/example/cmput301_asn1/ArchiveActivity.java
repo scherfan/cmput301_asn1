@@ -447,7 +447,7 @@ public class ArchiveActivity extends Activity
 	}
 
 	// Change activity methods
-	
+
 	public void emailItemFromArchive(MenuItem menu)
 	{
 		Intent intent = new Intent(ArchiveActivity.this, EmailActivity.class);
@@ -457,6 +457,12 @@ public class ArchiveActivity extends Activity
 	public void viewSummaryFromArchive(MenuItem menu)
 	{
 		Intent intent = new Intent(ArchiveActivity.this, SummaryActivity.class);
+		startActivity(intent);
+	}
+
+	public void settings(MenuItem menu)
+	{
+		Intent intent = new Intent(ArchiveActivity.this, SettingsActivity.class);
 		startActivity(intent);
 	}
 }

@@ -1,11 +1,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/action_settings"
-        android:onClick="settings"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
+        android:id="@+id/email_option"
+        android:onClick="emailItem"
+        android:title="@string/email_menu_title"/>
     <item
         android:id="@+id/summary_option"
         android:onClick="viewSummary"

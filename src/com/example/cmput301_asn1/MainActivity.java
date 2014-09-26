@@ -135,10 +135,10 @@ public class MainActivity extends Activity
 
 	}
 
-	/* 
-	 * Loads items and initializes adapter,
-	 * also checks items if they were checked earlier. Idea and style borrowed
-	 * from the work done in the lab. https://github.com/joshua2ua/lonelyTwitter
+	/*
+	 * Loads items and initializes adapter, also checks items if they were
+	 * checked earlier. Idea and style borrowed from the work done in the lab.
+	 * https://github.com/joshua2ua/lonelyTwitter
 	 */
 	@Override
 	protected void onResume()
@@ -503,24 +503,29 @@ public class MainActivity extends Activity
 		}
 	}
 
-	// Handles starting the archive activity
+	// Change activity methods
+
 	public void viewArchive(MenuItem menu)
 	{
 		Intent intent = new Intent(MainActivity.this, ArchiveActivity.class);
 		startActivity(intent);
 	}
 
-	// Handles starting the email activity
 	public void emailItem(MenuItem menu)
 	{
 		Intent intent = new Intent(MainActivity.this, EmailActivity.class);
 		startActivity(intent);
 	}
 
-	// Handles starting the summary activity
 	public void viewSummary(MenuItem menu)
 	{
 		Intent intent = new Intent(MainActivity.this, SummaryActivity.class);
+		startActivity(intent);
+	}
+
+	public void settings(MenuItem menu)
+	{
+		Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
 		startActivity(intent);
 	}
 
