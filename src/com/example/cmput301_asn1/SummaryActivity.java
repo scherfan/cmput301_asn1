@@ -45,17 +45,17 @@ public class SummaryActivity extends Activity
     
     private int getArchiveUnchecked()
     {
-        return ArchiveActivity.giveUnchecked();
+        return ArchiveActivityHelpers.giveUnchecked();
     }
 
     private int getArchiveChecked()
     {
-        return ArchiveActivity.giveChecked();
+        return ArchiveActivityHelpers.giveChecked();
     }
 
     private int getArchiveTotal()
     {
-        return ArchiveActivity.giveTotal();
+        return ArchiveActivityHelpers.giveTotal();
     }
 
     private int getTodoUnchecked()

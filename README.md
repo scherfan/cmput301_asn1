@@ -1,18 +1,33 @@
-todo_list
+cherfan-To Do List
 ============
+Project Name: cmput301_asn1
+App name: cherfan-To Do List
+Name:Steven Cherfan
+CCID: cherfan
+
 
 A simple todo list app on Android.
 
-The main screen handles the adding/deleteing, viewing of the to do list. It also
-acts as a hub to access the archiveing, emailing and summary screens. To add a
-to do item to the list; type in the intended to do text into the textbox and then
-press the Add button. After you have completed a task press the box at the end
-of the intended item in the list and it will become checked off.
+This app is capable of adding to do tasks and checking them off when the task is completed; it is
+also capable of archiving tasks for later reference. From both activities you can also delete tasks
+as well as move them back and forth between archived and in the main todo view. The app will allow you
+to send a selection of tasks from the todo view and archive view in an email with an email client.
+Finally you can view statistics of the tasks you have in the app.
 
-Deleteing, emailing, archiving or checking the summary is done via selecting
-and holding the click until a contextual menu appears with the formentioned
-choices.
+To operate and navigate around the app the main activity allows you to add tasks to a scrollable list
+by typing the task in the text box and clicking the add button. To check off the completed task just 
+click once. By clicking an holding on an item the app will bring up a contextual menu allowing for
+deleteing or archiving of tasks. Clicking on the menu bar in the upper right corner the app will
+give you access to emailing tasks, viewing the archive screen, viewing the summary screen and 
+accessing settings(which haven't been implemented in this release).
 
-To delete a to do item simply click and hold on the intended item until the menu
-appears and then select delete. A warning will appear at that point in which case
-allowing you to confirm the deletion or change your mind by pressing cancel.
+After either clicking on the view archive button or long clicking on a task and selecting archive
+the app will bring you to the archive screen. By selecting the archive button while long clicking
+on a task the app will remove it from the main list and bring it to this screen. This screen has
+the same options in the upper right corner as all other screens. Clicking on a task will check or
+uncheck it while long clicking a task will give the options of deleteing a task or unarchiving the
+task. Unarchiving will bring the task back to the main screen list.
+
+The email screen will allow you to select all or some tasks available in the main list or in the archive
+list and sending thos tasks to an email client on the device for emailing. Clicking the tasks and then
+clicking the email button at the bottom of the screen will do this.  

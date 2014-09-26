@@ -10,8 +10,6 @@ public class MainActivityHelpers extends MainActivity
 		return todoList;
 	}
 
-
-
 	public static int giveTotal()
 	{
 		if (todoListView != null)

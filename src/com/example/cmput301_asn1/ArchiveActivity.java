@@ -36,12 +36,16 @@ import com.google.gson.reflect.TypeToken;
 public class ArchiveActivity extends Activity
 {
 
+	// File for storing the archived items
 	protected static final String ARCHIVEFILENAME = "archivefile.sav";
 
+	// File for keeping the checks persistent
 	protected static final String CHECKARCHIVEFILENAME = "checkarchivefile.sav";
 
+	// Holds archived items
 	protected static ArrayList<String> archivedList;
 
+	// Used to keep track which archived items were checked
 	protected static ArrayList<String> checkArchiveItem;
 
 	protected static ArrayAdapter<String> adapter;
@@ -55,21 +59,36 @@ public class ArchiveActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_archive);
+		// Initializes array lists if they have not been initialized yet
 		if (archivedList == null)
 			archivedList = new ArrayList<String>();
 		if (checkArchiveItem == null)
 			checkArchiveItem = new ArrayList<String>();
 
+		/*
+		 * If an item is being passed to here to be archived from main activity
+		 * where the app is being run after being destroyed this block handles
+		 * the storing of the item. This avoids the null pointer error from
+		 * trying to access a null array list from main activity.
+		 */
 		if (archivedList == null || checkArchiveItem == null)
 		{
 			Intent intent = getIntent();
 			int position;
 			if (intent.getStringArrayExtra(MainActivity.EXTRA_MESSAGE) != null)
 			{
+				// toArchive[0] is the item to be archived.
+				// toArchvie[1] is whether or not it was checked before being
+				// archived.
 				String[] toArchive = intent
 				        .getStringArrayExtra(MainActivity.EXTRA_MESSAGE);
 				if (toArchive[1].equals("true") == true)
 				{
+					/*
+					 * If it is checked in main then store the string and update
+					 * listview. Update the array list that tracks checked items
+					 * and save to file.
+					 */
 					archivedList.add(toArchive[0]);
 					adapter.notifyDataSetChanged();
 					checkArchiveItem.add(toArchive[1]);
@@ -80,6 +99,7 @@ public class ArchiveActivity extends Activity
 				}
 				else
 				{
+					// Save to file as unchecked
 					archivedList.add(toArchive[0]);
 					adapter.notifyDataSetChanged();
 					checkArchiveItem.add(toArchive[1]);
@@ -90,12 +110,14 @@ public class ArchiveActivity extends Activity
 			}
 		}
 
-
 		archiveListView = (ListView) findViewById(R.id.archive_listview);
 		archiveListView.setItemsCanFocus(false);
 		registerForContextMenu(archiveListView);
-
-
+		
+		/*
+		 * Listens for user clicking an item to check it and saves it
+		 * to file.
+		 */
 		archiveListView.setOnItemClickListener(new OnItemClickListener()
 		{
 
@@ -114,9 +136,15 @@ public class ArchiveActivity extends Activity
 
 	}
 
+	/*
+	 * Handles saving the array list that tracks
+	 * which items are checked.
+	 * Code borrowed from joshua2ua and our work in the lab
+	 * https://github.com/scherfan/lonelyTwitter/tree/f14iot
+	 * (this applies to all loading from and saving to files)
+	 */
 	private void saveInCheckFile()
 	{
-		// TODO Auto-generated method stub
 		try
 		{
 			FileOutputStream fos = openFileOutput(CHECKARCHIVEFILENAME, 0);
@@ -137,9 +165,8 @@ public class ArchiveActivity extends Activity
 			e.printStackTrace();
 		}
 	}
-
-	// taken from lonelyTwitter
-
+	
+	// https://github.com/scherfan/lonelyTwitter/tree/f14iot
 	@Override
 	protected void onResume()
 	{
@@ -162,8 +189,8 @@ public class ArchiveActivity extends Activity
 		}
 	}
 
-	// taken from lonely twitter
-
+	
+	// https://github.com/scherfan/lonelyTwitter/tree/f14iot
 	private void loadFromCheckFile()
 	{
 		// TODO Auto-generated method stub
@@ -189,6 +216,7 @@ public class ArchiveActivity extends Activity
 		}
 	}
 
+	// https://github.com/scherfan/lonelyTwitter/tree/f14iot
 	private void loadFromArchiveFile()
 	{
 		try
@@ -213,7 +241,7 @@ public class ArchiveActivity extends Activity
 		}
 	}
 
-	// taken from lonelytwitter
+	// https://github.com/scherfan/lonelyTwitter/tree/f14iot
 	private void saveInArchiveFile()
 	{
 		try
@@ -237,7 +265,7 @@ public class ArchiveActivity extends Activity
 		}
 	}
 
-	// taken from lonelytwitter
+	// https://github.com/scherfan/lonelyTwitter/tree/f14iot
 	private void saveInTodoFile()
 	{
 		try
@@ -261,7 +289,7 @@ public class ArchiveActivity extends Activity
 		}
 	}
 
-	// taken from lonelytwitter
+	// https://github.com/scherfan/lonelyTwitter/tree/f14iot
 	private void saveInTodoCheckFile()
 	{
 		try
@@ -316,15 +344,11 @@ public class ArchiveActivity extends Activity
 
 	private void unarchiveItem(int position, View v)
 	{
-		// Intent backToMainIntent = new Intent();
-
 		CheckedTextView item = (CheckedTextView) v;
 		if (item.isChecked())
 		{
 			String[] unArchive = { archivedList.get(position).toString(),
 			        "true" };
-			// backToMainIntent.putExtra(EXTRA_MESSAGE, unArchive);
-			// setResult(Activity.RESULT_OK, backToMainIntent);
 			MainActivity.todoList.add(unArchive[0]);
 			MainActivity.todoAdapter.notifyDataSetChanged();
 			MainActivity.checkListItem.add(unArchive[1]);
@@ -341,8 +365,6 @@ public class ArchiveActivity extends Activity
 		{
 			String[] unArchive = { archivedList.get(position).toString(),
 			        "false" };
-			// backToMainIntent.putExtra(EXTRA_MESSAGE, unArchive);
-			// setResult(Activity.RESULT_OK, backToMainIntent);
 			MainActivity.todoList.add(unArchive[0]);
 			MainActivity.todoAdapter.notifyDataSetChanged();
 			MainActivity.checkListItem.add(unArchive[1]);
@@ -358,6 +380,7 @@ public class ArchiveActivity extends Activity
 	}
 
 	// Adapted from student-picker
+	// https://github.com/abramhindle/student-picker
 	private void deleteItem(int position)
 	{
 		AlertDialog.Builder deladb = new AlertDialog.Builder(
@@ -424,35 +447,5 @@ public class ArchiveActivity extends Activity
 	{
 		Intent intent = new Intent(ArchiveActivity.this, SummaryActivity.class);
 		startActivity(intent);
-	}
-
-	public static ArrayList<String> giveList()
-	{
-		return archivedList;
-	}
-
-	public static int giveUnchecked()
-	{
-		if (archiveListView != null)
-			return (archiveListView.getCount() - archiveListView
-			        .getCheckedItemCount());
-		else
-			return 0;
-	}
-
-	public static int giveChecked()
-	{
-		if (archiveListView != null)
-			return archiveListView.getCheckedItemCount();
-		else
-			return 0;
-	}
-
-	public static int giveTotal()
-	{
-		if (archiveListView != null)
-			return archiveListView.getCount();
-		else
-			return 0;
 	}
 }
